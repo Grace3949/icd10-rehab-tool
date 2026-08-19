@@ -60,6 +60,7 @@ header.mast{padding:34px 0 18px; display:flex; flex-wrap:wrap; align-items:flex-
   border:1px solid var(--line); border-radius:var(--r);
   padding:16px; margin-bottom:18px;
   box-shadow:0 1px 0 var(--line), 0 8px 24px -18px rgba(0,0,0,.5);
+  max-height:78vh; overflow-y:auto;   /* 保險：黏頂區永遠不會吃掉整個畫面 */
 }
 .searchrow{display:flex; gap:10px; align-items:stretch}
 .searchrow input{
@@ -73,6 +74,29 @@ header.mast{padding:34px 0 18px; display:flex; flex-wrap:wrap; align-items:flex-
   border-radius:8px; padding:0 14px; cursor:pointer; font-family:var(--sans); font-size:14px;
 }
 .clearbtn:hover{color:var(--ink); border-color:var(--accent)}
+.togglebtn{
+  background:var(--sunk); border:1px solid var(--line); color:var(--muted);
+  border-radius:8px; padding:0 12px; cursor:pointer; font-family:var(--sans); font-size:13px;
+  display:flex; align-items:center; gap:6px; white-space:nowrap;
+}
+.togglebtn:hover{color:var(--ink); border-color:var(--accent)}
+.togglebtn .tcaret{font-size:10px; transition:transform .18s ease}
+.console.collapsed .togglebtn .tcaret{transform:rotate(-90deg)}
+@media (prefers-reduced-motion:reduce){.togglebtn .tcaret{transition:none}}
+.console.collapsed .ctxwrap{display:none}
+.ctxsum{
+  display:none; width:100%; margin-top:10px; text-align:left; cursor:pointer;
+  background:var(--sunk); border:1px solid var(--line); border-radius:8px;
+  padding:7px 11px; font-family:var(--sans); font-size:12.5px; color:var(--muted);
+  align-items:center; gap:4px 10px; flex-wrap:wrap; line-height:1.5;
+}
+.console.collapsed .ctxsum{display:flex}
+.ctxsum:hover{border-color:var(--accent)}
+.ctxsum b{color:var(--ink); font-weight:600}
+.ctxsum .warn{color:var(--cond)}
+.ctxsum .lead{font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; font-weight:700}
+.ctxsum .act{margin-left:auto; color:var(--accent-ink); white-space:nowrap}
+@media(max-width:520px){.mode{display:none}}
 .mode{
   font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; color:var(--accent-ink);
   background:var(--accent-soft); border-radius:5px; padding:0 9px; display:flex; align-items:center; white-space:nowrap;
@@ -231,7 +255,10 @@ footer strong{color:var(--ink)}
       placeholder="I63.9、S06.5X9A、G80、中風、腦性麻痺、cerebral infarction…" aria-label="ICD-10-CM 代碼或診斷名稱">
     <span class="mode" id="mode">病名</span>
     <button class="clearbtn" id="clr" type="button">清除</button>
+    <button class="togglebtn" id="tgl" type="button" aria-expanded="true" aria-controls="ctxwrap">條件<span class="tcaret">▾</span></button>
   </div>
+  <button class="ctxsum" id="ctxsum" type="button" aria-controls="ctxwrap"></button>
+  <div class="ctxwrap" id="ctxwrap">
   <div class="ctxgrid">
     <div class="field">
       <label for="age">病人年齡 <span class="zh">Age (歲)</span></label>
@@ -271,6 +298,7 @@ footer strong{color:var(--ink)}
     <button class="chip" type="button">失語症</button>
     <button class="chip" type="button">五十肩</button>
     <button class="chip" type="button">人工關節置換</button>
+  </div>
   </div>
 </div>
 
@@ -34521,6 +34549,7 @@ function cardHTML(item,c,idx){
 
 function render(){
   const qv=$("q").value, c=ctx();
+  ctxSummary();   /* 條件變動時同步更新收合摘要 */
   const r=search(qv), box=$("results"), rel=$("related"), tal=$("tally");
   rel.innerHTML="";
   $("mode").textContent = r.mode==="code" ? "代碼" : "病名";
@@ -34572,6 +34601,24 @@ function wire(){
   });
 }
 
+/* 判定條件面板可收合。手機黏頂區原本高達半個螢幕會擋住查詢結果，
+   收合後只留搜尋框，並以一行摘要顯示目前生效的年齡與時序條件。 */
+const CONSOLE=document.querySelector(".console");
+function ctxSummary(){
+  const c=ctx(), P=[];
+  P.push(c.age===null ? '<span class="warn">年齡未填</span>' : '<span><b>'+c.age+'</b> 歲</span>');
+  P.push(c.tim==="?" ? '<span class="warn">病程未評估</span>' : '<span><b>'+esc($("tim").selectedOptions[0].textContent)+'</b></span>');
+  P.push(c.op==="?"  ? '<span class="warn">手術未評估</span>' : '<span><b>'+esc($("op").selectedOptions[0].textContent)+'</b></span>');
+  $("ctxsum").innerHTML='<span class="lead">判定條件</span>'+P.join("")+'<span class="act">展開修改 ▾</span>';
+}
+function setCollapsed(v){
+  CONSOLE.classList.toggle("collapsed",v);
+  $("tgl").setAttribute("aria-expanded",String(!v));
+  ctxSummary();
+}
+$("tgl").onclick=()=>setCollapsed(!CONSOLE.classList.contains("collapsed"));
+$("ctxsum").onclick=()=>{ setCollapsed(false); $("age").focus(); };
+
 let tmr=null;
 const debounced=()=>{ clearTimeout(tmr); tmr=setTimeout(render,110); };
 ["q"].forEach(id=>$(id).addEventListener("input",debounced));
@@ -34580,6 +34627,7 @@ $("clr").onclick=()=>{ $("q").value=""; $("q").focus(); render(); };
 document.querySelectorAll(".chip").forEach(ch=>{ ch.onclick=()=>{ $("q").value=ch.textContent; render(); $("q").focus(); }; });
 
 buildIndex();
+setCollapsed(window.matchMedia("(max-width:720px)").matches);   /* 手機預設收合，桌機展開 */
 render();
 </script>
 </body>
