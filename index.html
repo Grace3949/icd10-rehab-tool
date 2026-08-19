@@ -34033,6 +34033,7 @@ function buildIndex(){
   }
   NZ=new Array(CODES.length); NE=new Array(CODES.length); NALL=new Array(CODES.length);
   for(let i=0;i<CODES.length;i++){ NZ[i]=low(CODES[i].zh); NE[i]=low(CODES[i].en); NALL[i]=NZ[i]+""+low(CODES[i].en); }
+  for(const k in ALIAS) ALIAS_T[k]=ALIAS[k].map(function(x){return low(x)});
 }
 
 /* 臨床慣用語／縮寫對照層：官方名稱不含「中風」「CVA」等說法，於此補上 */
@@ -34155,8 +34156,9 @@ const ALIAS={
 "Z96.6":["人工關節置換","TKR","THR"],
 "M62.4":["攣縮","contracture"]
 };
-const ALIAS_L={};
-for(const k in ALIAS) ALIAS_L[k]=ALIAS[k].join("").toLowerCase();
+/* 別名以陣列保留，於 buildIndex 正規化。完全相符優先於部分相符，
+   避免「小中風」被查詢字「中風」命中而蓋過 I63；陣列越前面者視為越典型的說法。 */
+let ALIAS_T={};
 
 /* ============================ 規則 ============================ */
 const nc = s => s.toUpperCase().replace(/[^A-Z0-9]/g,"");
@@ -34384,17 +34386,24 @@ function search(qRaw){
     return {mode:"code", list:list.slice(0,80), notFound:!r};
   }
   const ql=low(q), out=[];
+  /* 三字以內的純拉丁字串在中文代碼庫幾乎都是臨床縮寫（TIA、SDH、CVA），
+     對中英全文做子字串比對只會撈到雜訊（如 tia 命中 initial），故只走別名與代碼比對。 */
+  const shortLatin = ql.length<=3 && /^[a-z0-9]+$/.test(ql);
   for(let i=0;i<CODES.length;i++){
     const e=CODES[i]; let sc=0;
-    const al=ALIAS_L[e.c];
-    if(al && al.includes(ql)) sc=900;
+    const at=ALIAS_T[e.c];
+    if(at){
+      const ix=at.indexOf(ql);
+      if(ix>=0) sc=950-Math.min(ix,20)*3;              /* 完全相符，越典型的說法分數越高 */
+      else if(at.some(function(t){return t.includes(ql)})) sc=880;  /* 部分相符 */
+    }
     if(sc===0){
       const t=NALL[i];
       const zl=NZ[i];
       if(NE[i]===ql) sc=840;
       else
       if(zl===ql) sc=850;
-      else if(t.includes(ql)) sc=600+Math.round(180*Math.min(1,ql.length/Math.max(4,zl.length)));
+      else if(!shortLatin && t.includes(ql)) sc=600+Math.round(180*Math.min(1,ql.length/Math.max(4,zl.length)));
     }
     if(sc>0){ if(e.u) sc+=12; if(e.c.length<=5) sc+=25; out.push({e,sc}); }
   }
