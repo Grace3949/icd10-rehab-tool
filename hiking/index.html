@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>台中出發山行手帳</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;900&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: topo-map paper. Filter bar on top, trail list left, sticky trail sheet right; stacks to one column on phones. */
+:root{
+  --paper:#eef0e7; --panel:#fbfbf6; --sunk:#e2e6da; --ink:#1b231f; --muted:#59645e; --line:#cbd1c2;
+  --contour:#a8774a; --accent:#2b6a4e; --accent-ink:#1b4a36; --accent-soft:#d6e5da; --on-accent:#ffffff;
+  --d1:#3b8a57; --d2:#6a9636; --d3:#b8841a; --d4:#c25b26; --d5:#a33131;
+  --warn-bg:#f6ead2; --warn-ink:#6f4a07;
+  --display:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Consolas,monospace;
+  --r:8px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#111613; --panel:#192019; --sunk:#222a24; --ink:#e2e8e1; --muted:#9aa69e; --line:#313b34;
+    --contour:#c29467; --accent:#7cc39b; --accent-ink:#a6dcbd; --accent-soft:#1e3a2b; --on-accent:#0d1a13;
+    --d1:#6cc58b; --d2:#a5c867; --d3:#e2b24a; --d4:#ec8a59; --d5:#ef6f6f;
+    --warn-bg:#3a2e14; --warn-ink:#f0cf8a; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#111613; --panel:#192019; --sunk:#222a24; --ink:#e2e8e1; --muted:#9aa69e; --line:#313b34;
+  --contour:#c29467; --accent:#7cc39b; --accent-ink:#a6dcbd; --accent-soft:#1e3a2b; --on-accent:#0d1a13;
+  --d1:#6cc58b; --d2:#a5c867; --d3:#e2b24a; --d4:#ec8a59; --d5:#ef6f6f;
+  --warn-bg:#3a2e14; --warn-ink:#f0cf8a; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.65 var(--body)}
+a{color:var(--accent-ink)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button,input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:0 48px}
+
+/* masthead */
+.mast{position:relative;overflow:hidden;border-bottom:1px solid var(--line);margin-bottom:18px}
+.mast svg.topo{position:absolute;inset:0;width:100%;height:100%;color:var(--contour);opacity:.28;pointer-events:none}
+.mast-in{position:relative;max-width:1240px;margin:0 auto;padding:28px 16px 20px;display:grid;gap:10px}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.14em;color:var(--contour);text-transform:uppercase}
+h1{font:900 clamp(28px,5vw,44px)/1.15 var(--display);margin:0;text-wrap:balance;letter-spacing:.02em}
+.lede{margin:0;color:var(--muted);max-width:62ch}
+.live{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.live a{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:var(--panel);text-decoration:none;font-size:13px;color:var(--ink)}
+.live a:hover{border-color:var(--accent)}
+.live a b{font-weight:500;color:var(--accent-ink)}
+
+/* filters */
+.filters{display:grid;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:16px}
+.frow{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.frow label{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.search{flex:1 1 240px;min-width:0;padding:9px 12px;border:1px solid var(--line);border-radius:6px;background:var(--paper)}
+select,.inp{padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:var(--paper)}
+input[type=range]{accent-color:var(--accent);width:150px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:4px 11px;font-size:13px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:7px 12px;cursor:pointer;font-size:14px}
+.btn:hover{border-color:var(--accent)}
+.btn.pri{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.btn.warn{color:var(--d5)}
+.count{font-size:13px;color:var(--muted)}
+
+/* main split */
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start}
+.list{display:grid;gap:8px;min-width:0}
+.row{display:grid;grid-template-columns:6px minmax(0,1fr);background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;cursor:pointer;text-align:left;padding:0;width:100%}
+.row:hover{border-color:var(--accent)}
+.row[aria-current="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.stripe{background:var(--dc)}
+.row-in{padding:11px 14px;display:grid;gap:6px;min-width:0}
+.row-top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.row .rname{font:600 17px/1.35 var(--display)}
+.row .sub{font-size:12.5px;color:var(--muted)}
+.facts{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px}
+.facts span{white-space:nowrap}
+.facts .k{color:var(--muted);margin-right:4px}
+.tag{font-size:12px;padding:1px 8px;border-radius:999px;border:1px solid var(--line);white-space:nowrap}
+.tag.in{background:var(--accent-soft);border-color:transparent;color:var(--accent-ink)}
+.tag.need{background:var(--warn-bg);border-color:transparent;color:var(--warn-ink)}
+.tag.mine{border-color:var(--accent);color:var(--accent-ink)}
+.dlevel{font-size:12px;font-weight:500;color:var(--dc);white-space:nowrap}
+.empty{padding:28px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r)}
+
+/* sheet */
+.sheet{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);max-height:calc(100vh - 24px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);min-width:0}
+.sheet-head{padding:18px 20px 14px;border-bottom:1px solid var(--line);display:grid;gap:6px;position:relative}
+.sheet-head h2{margin:0;font:900 26px/1.25 var(--display);text-wrap:balance;padding-right:40px}
+.closeX{display:none;position:absolute;right:12px;top:12px;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--paper);cursor:pointer;font-size:18px;line-height:1}
+.notice{margin:12px 20px 0;padding:10px 12px;border-radius:6px;background:var(--warn-bg);color:var(--warn-ink);font-size:13.5px}
+.notice b{font-weight:700}
+.kv{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border-block:1px solid var(--line);margin-top:14px}
+.kv div{background:var(--panel);padding:10px 14px;display:grid;gap:2px;min-width:0}
+.kv .k{font-size:11.5px;letter-spacing:.08em;color:var(--muted)}
+.kv .v{font:500 16px/1.35 var(--mono);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.kv .v small{font:12px var(--body);color:var(--muted);display:block}
+.sec{padding:14px 20px;border-bottom:1px solid var(--line);display:grid;gap:8px}
+.sec:last-child{border-bottom:0}
+.sec h4{margin:0;font:600 13px/1.4 var(--body);letter-spacing:.1em;color:var(--contour)}
+.sec p{margin:0}
+.sec ul{margin:0;padding-left:1.2em;display:grid;gap:3px}
+.links{display:flex;flex-wrap:wrap;gap:6px}
+.links a{font-size:13px;padding:4px 10px;border:1px solid var(--line);border-radius:6px;text-decoration:none;background:var(--paper)}
+.links a:hover{border-color:var(--accent)}
+.nav-btn{display:inline-flex;gap:8px;align-items:center;padding:8px 14px;border-radius:6px;background:var(--accent);color:var(--on-accent);text-decoration:none;font-weight:500;width:max-content;max-width:100%}
+
+/* month strip */
+.months{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:3px}
+.months span{font:11px/1 var(--mono);text-align:center;padding:7px 0;border-radius:3px;background:var(--sunk);color:var(--muted)}
+.months span.on{background:var(--accent);color:var(--on-accent)}
+.months span.now{outline:2px solid var(--contour);outline-offset:1px}
+.seasons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.seasons div{background:var(--paper);border-radius:6px;padding:9px 11px;min-width:0}
+.seasons b{display:block;font:600 13px var(--display);color:var(--contour);margin-bottom:2px}
+.seasons p{font-size:13.5px}
+
+/* my log */
+.mylog{display:grid;gap:8px}
+.mylog .frow{gap:8px}
+textarea{width:100%;min-height:72px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--paper);resize:vertical}
+.saved{font-size:12.5px;color:var(--accent-ink);min-height:1em}
+
+/* edit form */
+.form{display:grid;gap:10px}
+.form label{display:grid;gap:3px;font-size:13px;color:var(--muted)}
+.form input,.form select,.form textarea{width:100%;color:var(--ink)}
+.form .two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.mcheck{display:flex;flex-wrap:wrap;gap:4px}
+.mcheck label{display:flex;gap:3px;align-items:center;font-size:12.5px;color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:2px 6px}
+.form .acts{display:flex;flex-wrap:wrap;gap:8px}
+.confirm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;padding:8px 10px;background:var(--warn-bg);color:var(--warn-ink);border-radius:6px}
+
+/* lower panels */
+.panels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:28px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;display:grid;gap:10px;align-content:start;min-width:0}
+.panel h3{margin:0;font:600 18px/1.3 var(--display)}
+.panel p,.panel li{font-size:14px}
+.panel ul{margin:0;padding-left:1.2em;display:grid;gap:5px}
+.check label{display:flex;gap:8px;align-items:flex-start;font-size:14px;padding:3px 0}
+.check input{margin-top:5px;accent-color:var(--accent)}
+.foot{margin-top:24px;font-size:12.5px;color:var(--muted);max-width:80ch}
+
+@media (max-width:900px){
+  .split{grid-template-columns:minmax(0,1fr)}
+  .panels{grid-template-columns:minmax(0,1fr)}
+  .sheet{position:fixed;inset:0;max-height:none;border-radius:0;border:0;z-index:20;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+  .sheet:not(.open){display:none}
+  .closeX{display:block}
+  body.locked{overflow:hidden}
+}
+@media (max-width:520px){
+  .kv{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .kv div:last-child{grid-column:span 2}
+  .seasons,.form .two{grid-template-columns:minmax(0,1fr)}
+  .months span{font-size:10px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .row{transition:border-color .15s}
+}
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <svg class="topo" viewBox="0 0 1200 260" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g fill="none" stroke="currentColor" stroke-width="1.2">
+      <ellipse cx="960" cy="150" rx="70" ry="38"/><ellipse cx="960" cy="150" rx="130" ry="72"/><ellipse cx="955" cy="152" rx="200" ry="110"/>
+      <ellipse cx="950" cy="155" rx="280" ry="150"/><ellipse cx="945" cy="158" rx="370" ry="195"/><ellipse cx="940" cy="160" rx="470" ry="240"/>
+      <ellipse cx="300" cy="230" rx="60" ry="30"/><ellipse cx="300" cy="230" rx="120" ry="62"/><ellipse cx="305" cy="232" rx="190" ry="100"/>
+    </g>
+  </svg>
+  <div class="mast-in">
+    <div class="eyebrow">台中市西屯區出發 · 假日山行</div>
+    <h1>台中出發山行手帳</h1>
+    <p class="lede">20 條從近郊步道到百岳的路線，整理車程、停車、難度、距離、來回時間、山屋申請與季節亮點。資料可直接在頁面上修改，改過的內容會留在這台裝置的瀏覽器裡。</p>
+    <nav class="live" aria-label="出發前即時查詢">
+      <a href="https://www.cwa.gov.tw/V8/C/L/Mountain/Mountain.html" target="_blank" rel="noopener"><b>天氣</b>氣象署登山天氣</a>
+      <a href="https://recreation.forest.gov.tw/" target="_blank" rel="noopener"><b>步道</b>山林悠遊網路況公告</a>
+      <a href="https://168.thb.gov.tw/" target="_blank" rel="noopener"><b>公路</b>公路局即時路況</a>
+      <a href="https://hike.taiwan.gov.tw/" target="_blank" rel="noopener"><b>申請</b>登山申請一站式服務網</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="filters" aria-label="篩選">
+    <div class="frow">
+      <input id="q" class="search" type="search" placeholder="搜尋山名、地區、關鍵字（例如：杜鵑、楓紅、山屋、小百岳）">
+      <label for="sort">排序
+        <select id="sort">
+          <option value="drive">車程短→長</option>
+          <option value="diff">難度低→高</option>
+          <option value="hours">時間短→長</option>
+          <option value="alt">海拔高→低</option>
+        </select>
+      </label>
+    </div>
+    <div class="frow">
+      <label for="month">出發月份
+        <select id="month"></select>
+      </label>
+      <label for="drive">單趟車程上限 <input id="drive" type="range" min="30" max="360" step="15" value="360"> <span id="driveOut" class="mono">不限</span></label>
+    </div>
+    <div class="frow">
+      <span class="count">難度</span>
+      <div class="chips" id="diffChips"></div>
+      <span class="count">過夜</span>
+      <div class="chips" id="stayChips"></div>
+      <span class="count">我的</span>
+      <div class="chips" id="mineChips"></div>
+    </div>
+    <div class="frow" style="justify-content:space-between">
+      <span class="count" id="count"></span>
+      <button class="btn" id="addBtn" type="button">＋ 新增山區</button>
+    </div>
+  </section>
+
+  <div class="split">
+    <div class="list" id="list" aria-live="polite"></div>
+    <aside class="sheet" id="sheet" aria-label="路線詳情"></aside>
+  </div>
+
+  <div class="panels">
+    <section class="panel">
+      <h3>離線地圖去哪下載</h3>
+      <ul>
+        <li><a href="https://hikingbook.net/" target="_blank" rel="noopener">登山客 Hikingbook</a>：App 內搜尋路線後下載離線地圖與 GPX，可分享即時位置給留守人。</li>
+        <li><a href="https://hiking.biji.co/" target="_blank" rel="noopener">健行筆記</a>：路線頁可下載山友上傳的 GPX 軌跡，搭配下方 App 使用。</li>
+        <li><a href="https://rudy.basecamp.tw/" target="_blank" rel="noopener">魯地圖 Taiwan TOPO</a>：台灣最常用的離線登山等高線圖，可匯入 OruxMaps（Android）、Locus、Gaia GPS。</li>
+        <li><a href="https://map.happyman.idv.tw/twmap/" target="_blank" rel="noopener">地圖產生器</a>：產出可列印的經建版紙本地圖，手機沒電時的備援。</li>
+        <li><a href="https://www.gaiagps.com/" target="_blank" rel="noopener">Gaia GPS</a>：iPhone 上好用的離線導航 App，可疊加魯地圖。</li>
+      </ul>
+      <p class="count">出發前在有網路的地方先下載，並開飛航模式測試一次離線是否能看到軌跡。</p>
+    </section>
+    <section class="panel">
+      <h3>出發前檢查</h3>
+      <div class="check" id="checklist"></div>
+      <button class="btn" type="button" id="resetCheck">清除勾選</button>
+    </section>
+    <section class="panel">
+      <h3>資料備份與搬家</h3>
+      <p>你修改的路線、新增的山區、我的紀錄只存在這台裝置。換手機或電腦時，複製下方備份碼，到新裝置貼上即可。</p>
+      <div class="acts" style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" type="button" id="exportBtn">產生備份碼並複製</button>
+        <button class="btn" type="button" id="importToggle">貼上備份碼還原</button>
+      </div>
+      <textarea id="ioBox" hidden aria-label="備份碼"></textarea>
+      <div id="ioActs" hidden style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn pri" type="button" id="importBtn">套用這份備份</button>
+      </div>
+      <div class="saved" id="ioMsg"></div>
+      <div id="wipeArea"><button class="btn warn" type="button" data-w="ask">清除所有修改，回到預設資料</button></div>
+    </section>
+  </div>
+
+  <p class="foot">車程為非尖峰、自西屯區（台灣大道一帶）出發的單趟估計，假日、連假與上山路段常再多 30–90 分鐘；點路線內的「Google 導航」可看即時車程。路況、山屋申請規則與封閉公告最後查核於 2026 年 10 月，出發前仍請以林業及自然保育署、國家公園管理處與公路局的最新公告為準。緊急求救撥 112（無訊號時也可嘗試），並把行程留給留守人。</p>
+</main>
+
+<script>
+(function(){
+"use strict";
+
+var CHECKED = "2026-10";
+var TRAILS = [
+{id:"dakeng",name:"大坑 1–5 號步道・頭嵙山",area:"台中北屯｜大坑風景區",alt:859,diff:2,driveMin:30,driveVia:"台74 → 東山路二段",nav:"大坑風景區 1號登山步道",
+ parking:"各號步道口都有小型停車場，假日 8 點後常滿；可改停東山路沿線收費停車場再步行。",
+ length:"單條步道單程約 1.2–2.5 km；可互相串接",lengthKm:4,time:"1.5–3 小時",hours:2.5,stay:"day",stayNote:"當日往返",permit:"免申請",
+ safety:["1 號步道有岩壁拉繩段，4 號步道為連續陡階","雨後木棧道與砂岩面濕滑","夏季注意虎頭蜂與蛇，早上出發避開高溫","假日人多，下坡讓上坡"],
+ best:[10,11,12,1,2,3,4],spring:"4–5 月油桐花盛開，步道鋪白。",summer:"悶熱，建議清晨或傍晚走，帶 1.5 公升水。",autumn:"天氣穩定，傍晚可看台中盆地夕陽與夜景。",winter:"涼爽乾燥，最適合練腳力。",
+ maps:[],notice:"",tags:"近郊 練腳力 頭嵙山 小百岳 油桐花 夜景"},
+{id:"huoyan",name:"火炎山",area:"苗栗三義／苑裡｜火炎山自然保留區旁",alt:602,diff:3,driveMin:50,driveVia:"國1 / 國3 → 三義",nav:"火炎山南登山口",
+ parking:"南登山口停車場（三義端），車位有限，假日 7 點前到較穩。",
+ length:"南登山口上主峰 O 型約 5 km",lengthKm:5,time:"3–4 小時",hours:3.5,stay:"day",stayNote:"當日往返",permit:"免申請",
+ safety:["礫石惡地陡坡，鬆動砂石易滑倒，穿抓地力好的登山鞋","勿越過護欄進入自然保留區崩崖","全程幾乎無遮蔭，夏天極易中暑","颱風、大雨後崩塌，留意封閉公告"],
+ best:[11,12,1,2,3],spring:"4–5 月相思樹開黃花，山頭一片金黃。",summer:"高溫曝曬，不建議。",autumn:"秋高氣爽，峭壁惡地地形最清晰。",winter:"溫度舒適，晴天可遠眺大安溪出海口。",
+ maps:[],notice:"",tags:"近郊 惡地 小百岳 馬尾松"},
+{id:"manabang",name:"馬那邦山",area:"苗栗大湖／泰安",alt:1406,diff:3,driveMin:80,driveVia:"台3 → 卓蘭 → 大湖",nav:"馬那邦山天然湖登山口",
+ parking:"天然湖登山口路邊停車，秋季楓紅假日車多，請勿擋住產業道路。",
+ length:"天然湖線來回約 6–7 km",lengthKm:6.5,time:"4–5 小時",hours:4.5,stay:"day",stayNote:"當日往返",permit:"免申請",
+ safety:["陡坡土徑，雨後泥濘","產業道路狹窄，會車小心","秋季午後易起霧，掌握下山時間"],
+ best:[11,12,3,4],spring:"4 月油桐花，步道清幽。",summer:"午後雷陣雨多，宜早出發。",autumn:"11 月下旬至 12 月中旬楓紅，是中部賞楓名山；沿途有日治時期抗日古戰場遺跡。",winter:"偏冷多霧，晴天展望好。",
+ maps:[],notice:"",tags:"楓紅 小百岳 古戰場"},
+{id:"jiali",name:"加里山",area:"苗栗南庄｜鹿場",alt:2220,diff:4,driveMin:110,driveVia:"國1 / 國3 → 頭份 → 南庄 → 苗21",nav:"加里山 鹿場登山口",
+ parking:"鹿場登山口停車場，假日早滿；苗21 後段山路窄。",
+ length:"鹿場線來回約 9 km，爬升約 1,000 m",lengthKm:9,time:"6–7 小時",hours:6.5,stay:"day",stayNote:"當日往返（可住南庄）",permit:"免申請",
+ safety:["後段陡升，有拉繩與樹根攀爬","午後常起霧，建議 7 點前起登","寒流期稜線偶有結冰","手機訊號不穩，先下載離線地圖"],
+ best:[10,11,12,3,4,5],spring:"杉木林新綠，偶見台灣藍鵲。",summer:"林蔭涼爽但雷陣雨頻繁。",autumn:"晴朗時山頂可遠眺聖稜線與大霸尖山。",winter:"冷，偶有霧凇。",
+ maps:[],notice:"",tags:"中級山 小百岳 森林鐵道 聖稜線"},
+{id:"yuanzui",name:"鳶嘴山",area:"台中和平｜大雪山林道 27K",alt:2180,diff:4,driveMin:100,driveVia:"國4 → 豐原 → 東勢 → 大雪山林道",nav:"鳶嘴山登山口",
+ parking:"27K 登山口停車格約十餘格（計次 50 元／4 小時），假日 8 點後沿林道白線處停放；登山口對面有公廁（沿途唯一）。",
+ length:"環形步道約 2.1 km（可再串稍來山縱走）",lengthKm:2.1,time:"3.5–4 小時",hours:4,stay:"day",stayNote:"當日往返",permit:"免申請（進入大雪山林道上段需付遊樂區費用）",
+ safety:["岩稜段需拉繩攀爬，保持三點不動，戴手套","下雨、強風或岩面潮濕不要上岩稜","有懼高症者慎行","林道落石，行車注意"],
+ best:[10,11,12,3,4,5],spring:"4–5 月岩壁上的西施花（粉紅杜鵑）盛開。",summer:"清晨雲海機會高，午後雷雨前下山。",autumn:"天氣穩，展望好，可眺雪山山脈。",winter:"寒流後岩面結霜，非常危險。",
+ maps:[],notice:"",tags:"岩稜 西施花 雲海 中級山"},
+{id:"shaolai",name:"稍來山・小雪山（大雪山森林遊樂區）",area:"台中和平｜大雪山林道上段",alt:2307,diff:2,driveMin:120,driveVia:"國4 → 東勢 → 大雪山林道",nav:"大雪山國家森林遊樂區",
+ parking:"稍來山登山口路邊停車；遊樂區內另有收費停車場（35K 收費站購票）。",
+ length:"稍來山來回約 3–4 km；天池、神木步道各 1 km 內",lengthKm:3.5,time:"2–3 小時",hours:2.5,stay:"opt",stayNote:"可住遊樂區木屋",permit:"免申請（遊樂區門票）",
+ safety:["海拔 2,000 m 以上溫差大，帶保暖外套","林道落石、起霧時能見度低","冬季偶降雪，林道可能管制"],
+ best:[3,4,5,10,11,12],spring:"4 月紅榨槭新芽與杜鵑。",summer:"避暑勝地，清晨可見帝雉、藍腹鷴。",autumn:"11–12 月青楓、紅榨槭轉紅。",winter:"寒流時小雪山可能降雪。",
+ maps:[],notice:"",tags:"小百岳 楓紅 賞鳥 帝雉 親子"},
+{id:"baxian",name:"八仙山主峰",area:"台中和平｜八仙山國家森林遊樂區",alt:2366,diff:5,driveMin:100,driveVia:"國4 → 東勢 → 台8 往谷關",nav:"八仙山國家森林遊樂區",
+ parking:"遊樂區停車場（需購門票），開放 07:00–17:00。",
+ length:"主峰步道來回約 9–10 km，爬升約 1,500 m",lengthKm:9.5,time:"7–8 小時",hours:7.5,stay:"day",stayNote:"當日往返（需趕在 17:00 閉園前）",permit:"免申請（遊樂區門票）",
+ safety:["一路陡上，體力與膝蓋負擔大，建議帶登山杖","7 點入園即起登，否則來不及在閉園前下山","冬季天黑早，必帶頭燈"],
+ best:[10,11,12,3,4],spring:"新綠與山櫻。",summer:"遊樂區溪邊避暑（週四親水區維護暫停）。",autumn:"楓葉轉色，空氣清透。",winter:"寒冷，主峰偶結霜。",
+ maps:[{t:"健行筆記：八仙山步道群",u:"https://hiking.biji.co/index.php?q=trail&act=detail&id=260"},{t:"台中分署：遊樂區公告",u:"https://taichung.forest.gov.tw/0000161"}],
+ notice:"主峰登山口前動線改善施工，步道仍可通行，依現場指示行走（預計 115/11/20 完工）。",tags:"谷關七雄 中級山 體能"},
+{id:"xitou",name:"溪頭自然教育園區",area:"南投鹿谷",alt:1150,diff:1,driveMin:75,driveVia:"國3 → 竹山 → 投151",nav:"溪頭自然教育園區",
+ parking:"園區收費停車場，假日 9 點後入園車潮塞到鹿谷，早到為佳。",
+ length:"大學池、神木、空中走廊環線約 5–6 km",lengthKm:5.5,time:"2–3 小時",hours:2.5,stay:"opt",stayNote:"可住園區旅館",permit:"免申請（園區門票）",
+ safety:["午後常起霧、降溫快","木棧道潮濕易滑"],
+ best:[1,2,3,4,5,6,7,8,9,10,11,12],spring:"3–4 月柳杉林新綠，4–5 月夜間有螢火蟲。",summer:"均溫 20°C 左右，避暑首選。",autumn:"11–12 月銀杏林轉黃。",winter:"霧林氣氛，帶外套。",
+ maps:[],notice:"",tags:"親子 輕鬆 銀杏 森林浴"},
+{id:"shanlinxi",name:"杉林溪（松瀧岩・青龍瀑布）",area:"南投竹山",alt:1600,diff:1,driveMin:105,driveVia:"國3 → 竹山 → 投151 經溪頭續行",nav:"杉林溪森林生態渡假園區",
+ parking:"園區購票後停園區停車場；花季週末大塞車。",
+ length:"步道群單條 1–3 km，可組合 3–6 km",lengthKm:4,time:"2–4 小時",hours:3,stay:"opt",stayNote:"可住園區飯店",permit:"免申請（園區門票）",
+ safety:["瀑布區濕滑","山路彎多易暈車"],
+ best:[3,4,5,6],spring:"3–4 月牡丹花季。",summer:"5–6 月繡球花，避暑。",autumn:"楓紅點綴，人潮少。",winter:"寒流期可能結霜。",
+ maps:[],notice:"",tags:"親子 輕鬆 牡丹 繡球花 瀑布"},
+{id:"shuishe",name:"水社大山",area:"南投魚池｜日月潭",alt:2059,diff:4,driveMin:80,driveVia:"國6 → 埔里 → 台21",nav:"水社大山登山口",
+ parking:"登山口一帶路邊或附近停車場（日月潭朝霧碼頭方向），假日早到。",
+ length:"來回約 10 km，爬升約 1,300 m",lengthKm:10,time:"6–8 小時",hours:7,stay:"day",stayNote:"當日往返（可住日月潭）",permit:"免申請",
+ safety:["長距離陡升，後段有拉繩","沿途無水源，至少帶 2 公升","冬季下午 5 點天黑，帶頭燈"],
+ best:[10,11,12,1,2,3,4],spring:"春季霧多，稜線清涼。",summer:"炎熱且午後雷雨，不建議。",autumn:"晴朗時可俯瞰整座日月潭與中央山脈。",winter:"晴天展望最好，早晨常有雲海。",
+ maps:[],notice:"",tags:"日月潭 小百岳 雲海 體能"},
+{id:"hehuan",name:"合歡山 石門山・主峰・東峰",area:"南投仁愛｜台14甲線",alt:3421,diff:2,driveMin:165,driveVia:"國6 → 埔里 → 台14 → 台14甲（清境）",nav:"武嶺停車場",
+ parking:"主峰停昆陽或武嶺停車場；東峰、石門山停合歡山莊或松雪樓停車場。平日 50 元／時、假日 60 元／時，每日上限 300 元。",
+ length:"石門山來回約 1.6 km；主峰來回約 4.8 km（水泥路）；東峰來回約 2.4 km",lengthKm:4.8,time:"每座 1–3 小時，可一天連走三座",hours:5,stay:"opt",stayNote:"可住松雪樓、合歡山莊或清境",permit:"免申請",
+ safety:["一天內從平地上到 3,000 m 以上，頭痛、噁心就下撤","紫外線強，午後易起霧與雷擊","冬季積雪時台14甲交通管制，需雪鏈與冰爪"],
+ best:[5,6,9,10,11],spring:"5 月底至 6 月中玉山杜鵑、紅毛杜鵑盛開。",summer:"高山野花，午後雷雨前完成。",autumn:"芒草、晴朗星空（合歡山暗空公園）。",winter:"寒流可能降雪，路面結冰。",
+ maps:[{t:"Hikingbook：合歡群峰 7 條路線",u:"https://hikingbook.net/"}],notice:"",tags:"百岳 入門 杜鵑 星空 雪景"},
+{id:"hehuannorth",name:"合歡北峰",area:"南投仁愛｜小風口",alt:3422,diff:3,driveMin:165,driveVia:"國6 → 埔里 → 台14甲",nav:"小風口停車場",
+ parking:"小風口停車場：平日 40 元／時、假日 60 元／時，每日上限 300 元；機車需 10 元硬幣。",
+ length:"來回約 4 km，爬升約 450 m",lengthKm:4,time:"3–4 小時",hours:3.5,stay:"day",stayNote:"當日往返",permit:"免申請",
+ safety:["前段連續陡坡，慢步調避免高山症","稜線強風、無遮蔽","冬季積雪結冰需冰爪"],
+ best:[5,6,10,11],spring:"6 月紅毛杜鵑滿坡，最熱門季節。",summer:"高山花草，午後雷雨。",autumn:"箭竹草原轉金黃、雲海。",winter:"雪景美但需冰爪與雪地經驗。",
+ maps:[],notice:"",tags:"百岳 入門 杜鵑 雲海"},
+{id:"nenggao",name:"奇萊南華（天池山莊・能高瀑布）",area:"南投仁愛｜能高越嶺道西段",alt:3358,diff:4,driveMin:150,driveVia:"國6 → 埔里 → 台14 霧社 → 投83 往屯原",nav:"屯原登山口",
+ parking:"屯原三處停車場約 40–50 輛，假日不夠停；Google 地圖上的「屯原登山口」是舊口，新登山口在第三停車場旁，雲天宮登山口再往上 1.4 km。道路窄、會車困難。",
+ length:"雲天宮線至天池山莊單程約 13.5–14.3 km；全程約 36 km",lengthKm:36,time:"2 天 1 夜或 3 天 2 夜",hours:30,stay:"need",stayNote:"天池山莊（住宿日前 60 日至前 5 日 15:00 申請）",permit:"入山證＋天池山莊床位",
+ safety:["原屯原 0–3K 崩塌已封閉，一律走雲天宮線","落石路段快速通過，不要停留","天池山莊通訊可能中斷，行程交代清楚","冬季稜線積雪需冰爪"],
+ best:[10,11,12,5,6],spring:"5–6 月杜鵑，能高瀑布水量大。",summer:"午後雷雨，宜早出發早抵達。",autumn:"10–12 月南華山箭竹草原轉金黃，天池山莊前常見雲瀑。",winter:"可能降雪，需雪地裝備。",
+ maps:[{t:"健行筆記：能高越嶺道",u:"https://hiking.biji.co/index.php?q=trail&act=detail&id=291"},{t:"山林悠遊網：能高越嶺道西段",u:"https://recreation.forest.gov.tw/Trail/RT?tr_id=064"},{t:"天池山莊申請",u:"https://tconline.forest.gov.tw/room/"}],
+ notice:"屯原舊登山口 0–3K 已封閉，改走雲天宮線；115 年 1 月起雲天宮線入口全面開放。",tags:"百岳 山屋 草原 雲瀑 能高瀑布"},
+{id:"qilai",name:"奇萊主北",area:"南投仁愛／花蓮秀林｜太魯閣國家公園",alt:3607,diff:5,driveMin:165,driveVia:"國6 → 埔里 → 台14甲（滑雪山莊叉路）",nav:"奇萊登山口 合歡山",
+ parking:"登山口在台14甲滑雪山莊叉路附近；車停松雪樓／合歡山莊收費停車場，多日停車費較高，可考慮包車接駁。",
+ length:"全程約 20–24 km（登山口至成功山屋 4.8 km）",lengthKm:22,time:"2 天 1 夜或 3 天 2 夜",hours:24,stay:"need",stayNote:"成功山屋（34 床，先搶先贏）或奇萊山屋（2026/8 試營運，40 床）",permit:"太魯閣國家公園入園許可＋入山證（入園日前 5 日至 2 個月申請）",
+ safety:["「黑色奇萊」稜線天氣多變，易迷霧失溫","北峰有拉繩陡岩","雷擊風險高，午後前離開稜線","需具 3,000 m 經驗與完整保暖裝備"],
+ best:[10,11,4,5],spring:"4–5 月天氣轉穩，杜鵑陸續開。",summer:"颱風與午後雷雨期，慎選日子。",autumn:"10–11 月最穩定，奇萊稜線大景。",winter:"雪攀等級，需專業裝備與經驗。",
+ maps:[{t:"健行筆記：奇萊主北",u:"https://hiking.biji.co/index.php?q=trail&act=detail&id=542"},{t:"太魯閣登山須知",u:"https://hike.taiwan.gov.tw/notice_a4.aspx"}],
+ notice:"新奇萊山屋（海拔 3,345 m）2026/8/21 起試營運，需事先申請床位；未取得床位依核准範圍搭帳。",tags:"百岳 進階 黑色奇萊 山屋"},
+{id:"xue",name:"雪山主東",area:"台中和平｜雪霸國家公園（武陵）",alt:3886,diff:4,driveMin:255,driveVia:"國6 → 台14甲（合歡）→ 大禹嶺 → 台8 → 梨山 → 台7甲；或國3／國5 經宜蘭",nav:"雪山登山口 武陵",
+ parking:"雪山登山口停車場（需付武陵農場門票），報到後起登。",
+ length:"單程 10.9 km（登山口→七卡山莊 2 km→369 約 7.15 km），來回約 21.8 km",lengthKm:21.8,time:"2 天 1 夜或 3 天 2 夜",hours:24,stay:"need",stayNote:"七卡山莊；三六九山莊改建中，改住三六九臨時營地（24 營位，先搶先贏）",permit:"雪霸國家公園入園申請（入園前 5 日至 2 個月，與床位綁定），免入山證",
+ safety:["「哭坡」陡上，黑森林岔路多易迷途","冬季（約 1–3 月）圈谷積雪需雪地裝備與審查","颱風或豪雨後常封園"],
+ best:[10,11,4,5],spring:"4–5 月圈谷殘雪與杜鵑。",summer:"圈谷高山花草，雷雨多。",autumn:"10–11 月天氣最穩，台灣第二高峰大景。",winter:"雪攀季，限有雪地經驗者。",
+ maps:[{t:"雪霸國家公園入園申請",u:"https://hike.taiwan.gov.tw/"}],
+ notice:"雪霸 2026/8/29 全面恢復開放。另有「登山口至七卡山莊」單日往返健行，每日 80 名額隨到隨辦。",tags:"百岳 圈谷 營地 台灣第二高峰"},
+{id:"yushan",name:"玉山主峰",area:"南投信義／嘉義阿里山｜玉山國家公園塔塔加",alt:3952,diff:4,driveMin:180,driveVia:"國3 → 竹山 → 台16 水里 → 台21 新中橫",nav:"上東埔停車場",
+ parking:"停上東埔停車場，於排雲登山服務中心報到查驗證件，再搭接駁車到塔塔加登山口（06:30–17:00，單程 100 元／人）。",
+ length:"來回 21.8 km（登山口→排雲山莊 8.5 km，→主峰 2.4 km）",lengthKm:21.8,time:"2 天 1 夜",hours:20,stay:"need",stayNote:"排雲山莊（抽籤，入園前一個月公告）",permit:"玉山國家公園入園許可＋入山許可",
+ safety:["高山症：第一天慢走，多喝水","主峰前碎石坡與鐵鍊段，強風時壓低重心","冬季積雪期需冰爪並符合雪季規定"],
+ best:[10,11,3,4,5],spring:"4–5 月玉山杜鵑。",summer:"颱風與午後雷雨，留意封山公告。",autumn:"最穩定季節，主峰日出成功率高。",winter:"雪季需雪地裝備。",
+ maps:[{t:"玉管處：交通方式",u:"https://www.ysnp.gov.tw/Trail/7fa5c242-df1a-4a8e-bcab-32dc55b1f7b6?Tab=4"}],
+ notice:"",tags:"百岳 台灣最高峰 山屋 日出"},
+{id:"linzhi",name:"麟趾山・鹿林山（塔塔加）",area:"南投信義｜塔塔加遊憩區",alt:2854,diff:2,driveMin:180,driveVia:"國3 → 竹山 → 台16 → 台21",nav:"塔塔加遊客中心",
+ parking:"塔塔加遊客中心或上東埔停車場。",
+ length:"O 型約 5–7 km",lengthKm:6,time:"3–4 小時",hours:3.5,stay:"day",stayNote:"當日往返（可住東埔或鹿林山莊）",permit:"免申請",
+ safety:["近 3,000 m，留意高山症","午後起霧，岔路多看指標"],
+ best:[4,5,10,11,12],spring:"4–5 月玉山杜鵑。",summer:"涼爽避暑，午後霧。",autumn:"雲海，可正面遠眺玉山主峰與前峰。",winter:"寒流偶積雪。",
+ maps:[],notice:"",tags:"輕鬆 玉山展望 雲海 杜鵑"},
+{id:"alishan",name:"阿里山 祝山・對高岳",area:"嘉義阿里山｜阿里山國家森林遊樂區",alt:2489,diff:2,driveMin:180,driveVia:"國3 → 嘉義 → 台18；或經塔塔加",nav:"阿里山國家森林遊樂區",
+ parking:"遊樂區停車場（需門票），看日出要凌晨抵達或前一晚住園區。",
+ length:"祝山觀日步道接對高岳約 5 km",lengthKm:5,time:"2–3 小時",hours:2.5,stay:"opt",stayNote:"建議前一晚住園區或奮起湖",permit:"免申請（遊樂區門票）",
+ safety:["凌晨氣溫低，帶保暖衣物與頭燈","花季人潮擁擠"],
+ best:[3,4,10,11,12],spring:"3–4 月吉野櫻花季。",summer:"避暑，清晨雲海。",autumn:"日出與雲海機率高。",winter:"晴朗乾冷，偶結霜。",
+ maps:[],notice:"",tags:"日出 雲海 櫻花 神木 輕鬆"},
+{id:"jiaming",name:"嘉明湖（向陽山・三叉山）",area:"台東海端｜南橫向陽",alt:3603,diff:4,driveMin:330,driveVia:"國3 → 國10 → 台20 南橫（甲仙 → 梅山口 → 向陽）",nav:"向陽國家森林遊樂區",
+ parking:"向陽國家森林遊樂區停車場；南橫梅山口–向陽為有條件通行。",
+ length:"來回約 26 km",lengthKm:26,time:"3 天 2 夜",hours:30,stay:"need",stayNote:"向陽山屋＋嘉明湖避難山屋（住宿前 30 日至前 4 日每天 15:00 抽籤）",permit:"入山證＋山屋床位",
+ safety:["南橫梅山口–向陽週二、三、四不開放；開放日 07:00–14:00 進入、17:00 前離開","三叉山一帶起霧易迷途，緊跟軌跡","稜線無遮蔽，強風失溫","天數長、海拔高，第一晚注意高山症"],
+ best:[10,11,4,5],spring:"5 月高山杜鵑。",summer:"颱風與雷雨季。",autumn:"10–11 月最穩，湖面湛藍如「天使的眼淚」。",winter:"湖面可能結冰，需冰爪。",
+ maps:[{t:"嘉明湖山屋申請",u:"https://jmlnt.forest.gov.tw/room/"},{t:"健行筆記：嘉明湖",u:"https://hiking.biji.co/index.php?q=trail&act=detail&id=347"},{t:"山林悠遊網：嘉明湖國家步道",u:"https://recreation.forest.gov.tw/Trail/RT?tr_id=139"}],
+ notice:"南橫管制時段依公路局公告為準（查核至 2026/8）。",tags:"百岳 高山湖泊 山屋 草原"},
+{id:"matcha",name:"抹茶山（聖母登山步道）",area:"宜蘭礁溪｜五峰旗",alt:900,diff:3,driveMin:160,driveVia:"國3 / 國1 → 國5 → 礁溪",nav:"五峰旗瀑布停車場",
+ parking:"五峰旗風景區停車場或聖母朝聖地停車場，假日爆滿。",
+ length:"來回約 7–8 km，石階多",lengthKm:7.5,time:"4–5 小時",hours:4.5,stay:"opt",stayNote:"可安排礁溪溫泉過夜",permit:"免申請",
+ safety:["石階、土徑雨後濕滑","宜蘭秋冬多雨霧，常看不到山景","夏季午後雷雨"],
+ best:[4,5,6,9],spring:"4–6 月草坡最綠，名副其實的抹茶色。",summer:"翠綠但炎熱，早上走。",autumn:"9 月仍有機會晴朗；10 月起東北季風帶雨。",winter:"濕冷多霧，展望機率低。",
+ maps:[],notice:"",tags:"草坡 溫泉 聖母山莊 遠程"}
+];
+
+/* ---------- storage ---------- */
+var KEY = "tw-hike-taichung-v1";
+var store = {edits:{},custom:[],log:{},check:{}};
+function load(){ try{ var s = JSON.parse(localStorage.getItem(KEY)||"null"); if(s && typeof s==="object"){ store.edits=s.edits||{}; store.custom=s.custom||[]; store.log=s.log||{}; store.check=s.check||{}; } }catch(e){} }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(store)); return true; }catch(e){ return false; } }
+load();
+
+function all(){
+  var base = TRAILS.map(function(t){ return Object.assign({}, t, store.edits[t.id]||{}, {custom:false, edited:!!store.edits[t.id]}); });
+  var cus = store.custom.map(function(t){ return Object.assign({maps:[],safety:[],best:[],tags:""}, t, {custom:true}); });
+  return base.concat(cus);
+}
+function get(id){ return all().filter(function(t){return t.id===id;})[0]; }
+
+/* ---------- helpers ---------- */
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+function $(id){ return document.getElementById(id); }
+var DIFF = {1:"入門",2:"輕鬆",3:"中級",4:"進階",5:"挑戰"};
+var STAY = {day:"單日往返",opt:"可過夜",need:"需山屋／營地"};
+var MINE = {want:"想去",done:"去過"};
+var NOW_M = new Date().getMonth()+1;
+function dcolor(d){ return "var(--d"+(d||3)+")"; }
+function fmtDrive(m){ m=+m||0; var h=Math.floor(m/60), r=m%60; return h? (h+" 小時"+(r? " "+r+" 分":"")) : (r+" 分"); }
+function navUrl(t){ return "https://www.google.com/maps/dir/?api=1&origin="+encodeURIComponent("台中市西屯區")+"&destination="+encodeURIComponent(t.nav||t.name)+"&travelmode=driving"; }
+function gsite(site,q){ return "https://www.google.com/search?q="+encodeURIComponent("site:"+site+" "+q); }
+function shortName(t){ return String(t.name).split(/[（(]/)[0]; }
+
+/* ---------- filters ---------- */
+var F = {q:"",sort:"drive",month:0,drive:360,diff:{},stay:{},mine:""};
+var monthSel = $("month");
+monthSel.innerHTML = '<option value="0">不限</option>' + [1,2,3,4,5,6,7,8,9,10,11,12].map(function(m){ return '<option value="'+m+'">'+m+' 月'+(m===NOW_M?"（本月）":"")+'</option>'; }).join("");
+
+function chipRow(el, map, key, single){
+  el.innerHTML = Object.keys(map).map(function(k){ return '<button type="button" class="chip" data-k="'+k+'" aria-pressed="false">'+map[k]+'</button>'; }).join("");
+  el.addEventListener("click", function(e){
+    var b = e.target.closest(".chip"); if(!b) return;
+    var k = b.dataset.k;
+    if(single){ F[key] = F[key]===k ? "" : k; [].forEach.call(el.children,function(c){ c.setAttribute("aria-pressed", String(c.dataset.k===F[key])); }); }
+    else { F[key][k] = !F[key][k]; b.setAttribute("aria-pressed", String(!!F[key][k])); }
+    renderList();
+  });
+}
+chipRow($("diffChips"), DIFF, "diff");
+chipRow($("stayChips"), STAY, "stay");
+chipRow($("mineChips"), MINE, "mine", true);
+
+$("q").addEventListener("input", function(){ F.q=this.value.trim(); renderList(); });
+$("sort").addEventListener("change", function(){ F.sort=this.value; renderList(); });
+monthSel.addEventListener("change", function(){ F.month=+this.value; renderList(); });
+$("drive").addEventListener("input", function(){ F.drive=+this.value; $("driveOut").textContent = F.drive>=360 ? "不限" : fmtDrive(F.drive); renderList(); });
+
+function anyOn(o){ for(var k in o){ if(o[k]) return true; } return false; }
+function filtered(){
+  var q = F.q.toLowerCase();
+  var rows = all().filter(function(t){
+    if(q){ var hay = [t.name,t.area,t.tags,t.spring,t.summer,t.autumn,t.winter,t.stayNote,t.permit].join(" ").toLowerCase(); if(hay.indexOf(q)<0) return false; }
+    if(F.drive<360 && (+t.driveMin||0)>F.drive) return false;
+    if(anyOn(F.diff) && !F.diff[t.diff]) return false;
+    if(anyOn(F.stay) && !F.stay[t.stay]) return false;
+    if(F.month && (t.best||[]).indexOf(F.month)<0) return false;
+    if(F.mine && ((store.log[t.id]||{}).state!==F.mine)) return false;
+    return true;
+  });
+  var by = {drive:function(t){return +t.driveMin||0;}, diff:function(t){return (+t.diff||0)*1000+(+t.driveMin||0);}, hours:function(t){return +t.hours||0;}, alt:function(t){return -(+t.alt||0);}}[F.sort];
+  rows.sort(function(a,b){ return by(a)-by(b); });
+  return rows;
+}
+
+/* ---------- list ---------- */
+var current = null;
+function renderList(){
+  var rows = filtered();
+  $("count").textContent = "符合 " + rows.length + " 條路線" + (F.month? "（"+F.month+" 月適合）":"");
+  if(!rows.length){ $("list").innerHTML = '<div class="empty">沒有符合條件的路線。放寬車程或難度試試。</div>'; return; }
+  $("list").innerHTML = rows.map(function(t){
+    var log = store.log[t.id]||{};
+    var inSeason = (t.best||[]).indexOf(F.month||NOW_M)>=0;
+    return '<button type="button" class="row" data-id="'+esc(t.id)+'" style="--dc:'+dcolor(t.diff)+'" aria-current="'+(t.id===current)+'">'+
+      '<span class="stripe"></span><span class="row-in">'+
+        '<span class="row-top"><span class="rname">'+esc(t.name)+'</span><span class="dlevel">'+(DIFF[t.diff]||"")+' '+esc(t.diff)+'/5</span></span>'+
+        '<span class="sub">'+esc(t.area)+' · 海拔 <span class="mono">'+esc(t.alt)+'</span> m</span>'+
+        '<span class="facts"><span><span class="k">車程</span><span class="mono">'+fmtDrive(t.driveMin)+'</span></span><span><span class="k">距離</span>'+esc(shortLen(t))+'</span><span><span class="k">時間</span>'+esc(t.time)+'</span></span>'+
+        '<span class="chips">'+(inSeason?'<span class="tag in">'+(F.month||NOW_M)+' 月適合</span>':'')+
+          '<span class="tag'+(t.stay==="need"?" need":"")+'">'+(STAY[t.stay]||"")+'</span>'+
+          (log.state?'<span class="tag mine">'+MINE[log.state]+(log.date?" "+esc(log.date):"")+'</span>':'')+
+          (t.edited?'<span class="tag">已修改</span>':'')+(t.custom?'<span class="tag">自訂</span>':'')+
+        '</span>'+
+      '</span></button>';
+  }).join("");
+}
+function shortLen(t){ return t.lengthKm? ("約 "+t.lengthKm+" km") : (t.length||"—"); }
+$("list").addEventListener("click", function(e){ var r=e.target.closest(".row"); if(r) open(r.dataset.id, true); });
+
+/* ---------- sheet ---------- */
+var mode = "view";
+var sheet = $("sheet");
+function open(id, user){
+  current = id; mode = "view"; renderSheet();
+  [].forEach.call(document.querySelectorAll(".row"), function(r){ r.setAttribute("aria-current", String(r.dataset.id===id)); });
+  if(user && window.matchMedia("(max-width:900px)").matches){ sheet.classList.add("open"); document.body.classList.add("locked"); sheet.scrollTop=0; }
+  else { sheet.scrollTop=0; }
+}
+function closeSheet(){ sheet.classList.remove("open"); document.body.classList.remove("locked"); }
+
+function renderSheet(){
+  var t = current==="__new" ? null : get(current);
+  if(mode==="edit"){ renderForm(t); return; }
+  if(!t){ sheet.innerHTML='<div class="sec"><p>從左邊選一條路線查看詳情。</p></div>'; return; }
+  var log = store.log[t.id]||{};
+  var months = [1,2,3,4,5,6,7,8,9,10,11,12].map(function(m){ return '<span class="'+((t.best||[]).indexOf(m)>=0?"on ":"")+(m===NOW_M?"now":"")+'">'+m+'</span>'; }).join("");
+  var autoMaps = [
+    {t:"健行筆記 GPX",u:gsite("hiking.biji.co",shortName(t))},
+    {t:"Hikingbook 離線圖",u:gsite("hikingbook.net",shortName(t))},
+    {t:"山林悠遊網",u:gsite("recreation.forest.gov.tw",shortName(t))}
+  ];
+  var maps = (t.maps||[]).concat(autoMaps).map(function(m){ return '<a href="'+esc(m.u)+'" target="_blank" rel="noopener">'+esc(m.t)+'</a>'; }).join("");
+  sheet.innerHTML =
+    '<div class="sheet-head" style="--dc:'+dcolor(t.diff)+'">'+
+      '<button type="button" class="closeX" data-act="close" aria-label="關閉">×</button>'+
+      '<span class="eyebrow">'+esc(t.area)+'</span>'+
+      '<h2>'+esc(t.name)+'</h2>'+
+      '<span class="dlevel" style="font-size:14px">難度 '+esc(t.diff)+'/5・'+(DIFF[t.diff]||"")+'　·　海拔 '+esc(t.alt)+' m</span>'+
+    '</div>'+
+    (t.notice?'<div class="notice"><b>最新公告　</b>'+esc(t.notice)+'</div>':'')+
+    '<div class="kv">'+
+      '<div><span class="k">西屯出發車程</span><span class="v">'+fmtDrive(t.driveMin)+'<small>單趟・非尖峰</small></span></div>'+
+      '<div><span class="k">步道長度</span><span class="v">'+(t.lengthKm?esc(t.lengthKm)+" km":"—")+'<small>來回／全程</small></span></div>'+
+      '<div><span class="k">來回時間</span><span class="v" style="font-family:var(--body)">'+esc(t.time)+'</span></div>'+
+    '</div>'+
+    '<div class="sec"><h4>交通與停車</h4><p>'+esc(t.driveVia)+'</p><p>'+esc(t.parking)+'</p>'+
+      '<a class="nav-btn" href="'+navUrl(t)+'" target="_blank" rel="noopener">Google 導航・看即時車程 →</a></div>'+
+    '<div class="sec"><h4>步道長度</h4><p>'+esc(t.length)+'</p></div>'+
+    '<div class="sec"><h4>過夜與申請</h4><p><span class="tag'+(t.stay==="need"?" need":"")+'">'+(STAY[t.stay]||"")+'</span>　'+esc(t.stayNote)+'</p><p>申請：'+esc(t.permit)+'</p></div>'+
+    '<div class="sec"><h4>難易與安全</h4><ul>'+(t.safety||[]).map(function(s){return "<li>"+esc(s)+"</li>";}).join("")+'</ul></div>'+
+    '<div class="sec"><h4>建議月份（框線為本月）</h4><div class="months">'+months+'</div>'+
+      '<div class="seasons"><div><b>春</b><p>'+esc(t.spring)+'</p></div><div><b>夏</b><p>'+esc(t.summer)+'</p></div><div><b>秋</b><p>'+esc(t.autumn)+'</p></div><div><b>冬</b><p>'+esc(t.winter)+'</p></div></div></div>'+
+    '<div class="sec"><h4>離線地圖與參考資料</h4><div class="links">'+maps+'</div></div>'+
+    '<div class="sec mylog"><h4>我的紀錄</h4>'+
+      '<div class="frow"><label for="logState">狀態 <select id="logState"><option value="">—</option><option value="want"'+(log.state==="want"?" selected":"")+'>想去</option><option value="done"'+(log.state==="done"?" selected":"")+'>去過</option></select></label>'+
+      '<label for="logDate">日期 <input id="logDate" class="inp" type="date" value="'+esc(log.date||"")+'"></label></div>'+
+      '<textarea id="logNote" placeholder="例如：6:30 到停車場還有位、東峰下坡膝蓋痛、下次帶冰爪…">'+esc(log.note||"")+'</textarea>'+
+      '<div class="frow"><button type="button" class="btn pri" data-act="saveLog">儲存紀錄</button><span class="saved" id="logMsg"></span></div>'+
+    '</div>'+
+    '<div class="sec"><h4>更新這條路線</h4><p class="count">路況、停車費或山屋規定變了，就直接改。'+(t.custom?"":"資料查核於 "+CHECKED+"。")+'</p>'+
+      '<div class="frow"><button type="button" class="btn" data-act="edit">編輯資料</button>'+
+      (t.edited?'<button type="button" class="btn" data-act="revert">還原預設資料</button>':'')+
+      (t.custom?'<button type="button" class="btn warn" data-act="del">刪除這條自訂路線</button>':'')+'</div>'+
+      '<div id="confirmBox"></div></div>';
+}
+
+var FIELDS = [
+  ["name","名稱","text"],["area","地區","text"],["alt","最高海拔（m）","num"],["diff","難度（1–5）","diff"],
+  ["driveMin","西屯出發車程（分鐘）","num"],["driveVia","路線","text"],["nav","Google 導航目的地","text"],["parking","停車建議","area"],
+  ["length","步道長度說明","text"],["lengthKm","長度（km，排序用）","num"],["time","來回時間","text"],["hours","時間（小時，排序用）","num"],
+  ["stay","過夜","stay"],["stayNote","山屋／營地說明","text"],["permit","申請","text"],["safety","安全注意（一行一點）","lines"],
+  ["best","建議月份","months"],["spring","春","area"],["summer","夏","area"],["autumn","秋","area"],["winter","冬","area"],
+  ["notice","最新公告","area"],["tags","關鍵字（空白分隔）","text"]
+];
+function renderForm(t){
+  var v = t || {name:"",area:"",alt:"",diff:3,driveMin:60,driveVia:"",nav:"",parking:"",length:"",lengthKm:"",time:"",hours:"",stay:"day",stayNote:"",permit:"免申請",safety:[],best:[],spring:"",summer:"",autumn:"",winter:"",notice:"",tags:""};
+  var html = FIELDS.map(function(f){
+    var k=f[0], lab=f[1], ty=f[2], val=v[k], id="f_"+k;
+    if(ty==="text"||ty==="num") return '<label for="'+id+'">'+lab+'<input class="inp" id="'+id+'" type="'+(ty==="num"?"number":"text")+'" step="any" value="'+esc(val)+'"></label>';
+    if(ty==="area") return '<label for="'+id+'">'+lab+'<textarea id="'+id+'">'+esc(val)+'</textarea></label>';
+    if(ty==="lines") return '<label for="'+id+'">'+lab+'<textarea id="'+id+'">'+esc((val||[]).join("\n"))+'</textarea></label>';
+    if(ty==="diff") return '<label for="'+id+'">'+lab+'<select id="'+id+'">'+[1,2,3,4,5].map(function(d){return '<option value="'+d+'"'+(+val===d?" selected":"")+'>'+d+'・'+DIFF[d]+'</option>';}).join("")+'</select></label>';
+    if(ty==="stay") return '<label for="'+id+'">'+lab+'<select id="'+id+'">'+Object.keys(STAY).map(function(s){return '<option value="'+s+'"'+(val===s?" selected":"")+'>'+STAY[s]+'</option>';}).join("")+'</select></label>';
+    if(ty==="months") return '<div><span class="count">'+lab+'</span><div class="mcheck">'+[1,2,3,4,5,6,7,8,9,10,11,12].map(function(m){return '<label><input type="checkbox" id="f_best_'+m+'" data-m="'+m+'"'+((val||[]).indexOf(m)>=0?" checked":"")+'>'+m+'月</label>';}).join("")+'</div></div>';
+    return "";
+  }).join("");
+  sheet.innerHTML = '<div class="sheet-head"><button type="button" class="closeX" data-act="close" aria-label="關閉">×</button><span class="eyebrow">'+(t?"編輯路線":"新增山區")+'</span><h2>'+(t?esc(t.name):"新的山區")+'</h2></div>'+
+    '<form class="form sec" id="editForm">'+html+'<div class="acts"><button type="submit" class="btn pri">儲存</button><button type="button" class="btn" data-act="cancel">取消</button></div><div class="saved" id="formMsg"></div></form>';
+  $("editForm").addEventListener("submit", function(e){ e.preventDefault(); submitForm(t); });
+}
+function submitForm(t){
+  var out = {};
+  FIELDS.forEach(function(f){
+    var k=f[0], ty=f[2];
+    if(ty==="months"){ out.best = [].slice.call(sheet.querySelectorAll("[data-m]")).filter(function(c){return c.checked;}).map(function(c){return +c.dataset.m;}); return; }
+    var el = $("f_"+k); if(!el) return; var val = el.value;
+    if(ty==="num"||ty==="diff") val = val===""? "" : +val;
+    if(ty==="lines") val = val.split("\n").map(function(s){return s.trim();}).filter(Boolean);
+    out[k] = val;
+  });
+  if(!String(out.name).trim()){ $("formMsg").textContent="請填寫名稱。"; return; }
+  if(!t){
+    out.id = "c"+Date.now(); out.maps=[];
+    store.custom.push(out); current = out.id;
+  } else if(t.custom){
+    store.custom = store.custom.map(function(c){ return c.id===t.id ? Object.assign({},c,out) : c; });
+  } else {
+    var base = TRAILS.filter(function(b){return b.id===t.id;})[0], diff = {};
+    Object.keys(out).forEach(function(k){ if(JSON.stringify(out[k])!==JSON.stringify(base[k])) diff[k]=out[k]; });
+    if(Object.keys(diff).length) store.edits[t.id]=diff; else delete store.edits[t.id];
+  }
+  save(); mode="view"; renderList(); renderSheet();
+}
+
+sheet.addEventListener("click", function(e){
+  var b = e.target.closest("[data-act]"); if(!b) return;
+  var act = b.dataset.act;
+  if(act==="close"){ closeSheet(); if(mode==="edit"){ mode="view"; if(current==="__new") current=null; renderSheet(); } }
+  else if(act==="edit"){ mode="edit"; renderSheet(); sheet.scrollTop=0; }
+  else if(act==="cancel"){ mode="view"; if(current==="__new"){ current=null; closeSheet(); } renderSheet(); }
+  else if(act==="saveLog"){
+    var st=$("logState").value, dt=$("logDate").value, nt=$("logNote").value;
+    if(!st && !dt && !nt.trim()) delete store.log[current]; else store.log[current]={state:st,date:dt,note:nt};
+    $("logMsg").textContent = save() ? "已儲存在這台裝置。" : "瀏覽器不允許儲存（可能是無痕模式），紀錄只會保留到關閉頁面。";
+    renderList();
+  }
+  else if(act==="revert"||act==="del"){
+    $("confirmBox").innerHTML='<div class="confirm">'+(act==="revert"?"確定把這條路線還原成預設資料？":"確定刪除這條自訂路線？")+'<button type="button" class="btn warn" data-act="'+act+'Yes">確定</button><button type="button" class="btn" data-act="no">取消</button></div>';
+  }
+  else if(act==="no"){ $("confirmBox").innerHTML=""; }
+  else if(act==="revertYes"){ delete store.edits[current]; save(); renderList(); renderSheet(); }
+  else if(act==="delYes"){ store.custom=store.custom.filter(function(c){return c.id!==current;}); delete store.log[current]; save(); current=null; closeSheet(); renderList(); renderSheet(); }
+});
+
+$("addBtn").addEventListener("click", function(){
+  current="__new"; mode="edit"; renderSheet();
+  if(window.matchMedia("(max-width:900px)").matches){ sheet.classList.add("open"); document.body.classList.add("locked"); }
+  sheet.scrollTop=0;
+});
+document.addEventListener("keydown", function(e){ if(e.key==="Escape") closeSheet(); });
+
+/* ---------- checklist ---------- */
+var CHECK = ["查氣象署登山天氣與降雨機率","查步道、林道、公路封閉公告","手機下載離線地圖與 GPX，並測試飛航模式","行程、路線、預計下山時間交給留守人","頭燈＋備用電池、行動電源","保暖外套與雨衣（高山必帶）","飲水至少 1.5–2 公升、行動糧","登山杖、手套（岩稜路線）","急救包、哨子、個人藥品","高山行程：入山／入園證、身分證正本、登山保險"];
+function renderCheck(){
+  $("checklist").innerHTML = CHECK.map(function(c,i){ return '<label><input type="checkbox" id="ck'+i+'" data-i="'+i+'"'+(store.check[i]?" checked":"")+'>'+esc(c)+'</label>'; }).join("");
+}
+$("checklist").addEventListener("change", function(e){ var i=e.target.dataset.i; if(i==null) return; store.check[i]=e.target.checked; save(); });
+$("resetCheck").addEventListener("click", function(){ store.check={}; save(); renderCheck(); });
+
+/* ---------- backup ---------- */
+var io = $("ioBox"), ioMsg=$("ioMsg");
+$("exportBtn").addEventListener("click", function(){
+  var code = JSON.stringify({app:"tw-hike-taichung",v:1,edits:store.edits,custom:store.custom,log:store.log});
+  io.hidden=false; $("ioActs").hidden=true; io.readOnly=true; io.value=code;
+  var done=function(){ ioMsg.textContent="已複製備份碼，可貼到記事本或傳給自己。"; };
+  var fail=function(){ io.focus(); io.select(); ioMsg.textContent="無法自動複製，備份碼已選取，請手動複製。"; };
+  try{ navigator.clipboard.writeText(code).then(done, fail); }catch(e){ fail(); }
+});
+$("importToggle").addEventListener("click", function(){ io.hidden=false; io.readOnly=false; io.value=""; $("ioActs").hidden=false; io.placeholder="把備份碼貼在這裡"; io.focus(); ioMsg.textContent=""; });
+$("importBtn").addEventListener("click", function(){
+  try{
+    var d = JSON.parse(io.value);
+    if(!d || d.app!=="tw-hike-taichung") throw 0;
+    store.edits=d.edits||{}; store.custom=d.custom||[]; store.log=d.log||{};
+    save(); renderList(); renderSheet(); ioMsg.textContent="已還原備份。"; $("ioActs").hidden=true;
+  }catch(e){ ioMsg.textContent="這段文字不是有效的備份碼，請確認有完整複製。"; }
+});
+var WIPE_BTN = '<button class="btn warn" type="button" data-w="ask">清除所有修改，回到預設資料</button>';
+$("wipeArea").addEventListener("click", function(e){
+  var b=e.target.closest("[data-w]"); if(!b) return; var w=b.dataset.w;
+  if(w==="ask") this.innerHTML='<div class="confirm">會清除所有修改、自訂路線與我的紀錄。<button type="button" class="btn warn" data-w="yes">確定清除</button><button type="button" class="btn" data-w="no">取消</button></div>';
+  else { if(w==="yes"){ store={edits:{},custom:[],log:{},check:{}}; save(); current=TRAILS[0].id; mode="view"; renderAll(); ioMsg.textContent="已回到預設資料。"; } this.innerHTML=WIPE_BTN; }
+});
+function renderAll(){ renderList(); renderSheet(); renderCheck(); }
+current = "hehuan";
+renderAll();
+})();
+</script>
+</body>
+</html>
