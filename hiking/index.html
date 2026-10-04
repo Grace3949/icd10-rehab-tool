@@ -170,6 +170,20 @@ textarea{width:100%;min-height:72px;padding:8px 10px;border:1px solid var(--line
 .xbdate{font-size:12px;color:var(--accent-ink);margin-left:6px}
 @media (max-width:700px){ .gkrow{grid-template-columns:repeat(4,minmax(0,1fr))} }
 
+/* parking */
+.lots{display:grid;gap:8px}
+.lot{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:9px 12px;display:grid;gap:3px;min-width:0}
+.lot-main{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;align-items:baseline}
+.lot-main b{font-weight:600}
+.lot .fee{font-size:13px;color:var(--accent-ink);font-weight:500}
+.lot p{font-size:13px;color:var(--muted)}
+.lot a{font-size:13px;width:max-content}
+.xbt.pk{min-width:760px}
+.xbt.pk td{white-space:normal;vertical-align:top}
+.xbt.pk td.pk-name{white-space:nowrap;background:var(--panel)}
+.xbt.pk td.pk-name .mono{display:block;font-size:12px;color:var(--muted)}
+.xbt.pk td.pk-note{color:var(--muted);font-size:13px;min-width:200px}
+
 /* lower panels */
 .panels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:28px}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;display:grid;gap:10px;align-content:start;min-width:0}
@@ -212,7 +226,7 @@ textarea{width:100%;min-height:72px;padding:8px 10px;border:1px solid var(--line
   <div class="mast-in">
     <div class="eyebrow">台中市西屯區出發 · 假日山行</div>
     <h1>台中出發山行手帳</h1>
-    <p class="lede">26 條從近郊步道、谷關七雄到百岳的路線，加上小百岳 100 座完登表，整理車程、停車、難度、距離、來回時間、山屋申請與季節亮點。資料可直接在頁面上修改，改過的內容會留在這台裝置的瀏覽器裡。</p>
+    <p class="lede">35 條從近郊步道、谷關七雄、嘉義阿里山到百岳的路線，加上小百岳 100 座完登表，整理車程、停車、難度、距離、來回時間、山屋申請與季節亮點。資料可直接在頁面上修改，改過的內容會留在這台裝置的瀏覽器裡。</p>
     <nav class="live" aria-label="出發前即時查詢">
       <a href="https://www.cwa.gov.tw/V8/C/L/Mountain/Mountain.html" target="_blank" rel="noopener"><b>天氣</b>氣象署登山天氣</a>
       <a href="https://recreation.forest.gov.tw/" target="_blank" rel="noopener"><b>步道</b>山林悠遊網路況公告</a>
@@ -261,6 +275,21 @@ textarea{width:100%;min-height:72px;padding:8px 10px;border:1px solid var(--line
     <div class="list" id="list" aria-live="polite"></div>
     <aside class="sheet" id="sheet" aria-label="路線詳情"></aside>
   </div>
+
+  <section class="xbsec" id="parkSec" aria-labelledby="parkTitle">
+    <div class="xbhead">
+      <div>
+        <h2 id="parkTitle">停車總覽</h2>
+        <p class="count">每條路線的停車場、收費與注意事項，跟著上方篩選條件變動。點「導航」直接開到停車場。收費常調整，以現場公告為準。</p>
+      </div>
+    </div>
+    <div class="tablewrap">
+      <table class="xbt pk">
+        <thead><tr><th>路線</th><th>停車場</th><th>收費</th><th>備註</th><th></th></tr></thead>
+        <tbody id="parkBody"></tbody>
+      </table>
+    </div>
+  </section>
 
   <section class="xbsec" id="xb" aria-labelledby="xbTitle">
     <div class="xbhead">
@@ -330,168 +359,222 @@ textarea{width:100%;min-height:72px;padding:8px 10px;border:1px solid var(--line
 
 var CHECKED = "2026-10";
 var TRAILS = [
-{id:"dakeng",name:"大坑 1–5 號步道・頭嵙山",area:"台中北屯｜大坑風景區",alt:859,diff:2,driveMin:30,driveVia:"台74 → 東山路二段",nav:"大坑風景區 1號登山步道",
+{id:"dakeng",lots:[["大坑1號步道停車場", "免費", "約 20–30 格，滿了可停周邊白線"], ["大坑中正露營區停車場", "依現場", "4、5 號步道與頭嵙山方向"], ["大坑地震公園停車場", "依現場", "主要停車場之一"], ["東山路二段私人停車場", "約 50–100 元／次", "假日備案"]],name:"大坑 1–5 號步道・頭嵙山",area:"台中北屯｜大坑風景區",alt:859,diff:2,driveMin:30,driveVia:"台74 → 東山路二段",nav:"大坑風景區 1號登山步道",
  parking:"各號步道口都有小型停車場，假日 8 點後常滿；可改停東山路沿線收費停車場再步行。",
  length:"單條步道單程約 1.2–2.5 km；可互相串接",lengthKm:4,time:"1.5–3 小時",hours:2.5,stay:"day",stayNote:"當日往返",permit:"免申請",
  safety:["1 號步道有岩壁拉繩段，4 號步道為連續陡階","雨後木棧道與砂岩面濕滑","夏季注意虎頭蜂與蛇，早上出發避開高溫","假日人多，下坡讓上坡"],
  best:[10,11,12,1,2,3,4],spring:"4–5 月油桐花盛開，步道鋪白。",summer:"悶熱，建議清晨或傍晚走，帶 1.5 公升水。",autumn:"天氣穩定，傍晚可看台中盆地夕陽與夜景。",winter:"涼爽乾燥，最適合練腳力。",
  maps:[],notice:"",tags:"近郊 練腳力 頭嵙山 小百岳 油桐花 夜景",xb:41},
-{id:"huoyan",name:"火炎山",area:"苗栗三義／苑裡｜火炎山自然保留區旁",alt:602,diff:3,driveMin:50,driveVia:"國1 / 國3 → 三義",nav:"火炎山南登山口",
+{id:"huoyan",lots:[["正松停車場 火炎山", "50 元／次", "國道橋下，步行約 100 m 到登山口"], ["火炎山登山口", "免費", "國道橋下空地，車位少易滿"]],name:"火炎山",area:"苗栗三義／苑裡｜火炎山自然保留區旁",alt:602,diff:3,driveMin:50,driveVia:"國1 / 國3 → 三義",nav:"火炎山南登山口",
  parking:"南登山口停車場（三義端），車位有限，假日 7 點前到較穩。",
  length:"南登山口上主峰 O 型約 5 km",lengthKm:5,time:"3–4 小時",hours:3.5,stay:"day",stayNote:"當日往返",permit:"免申請",
  safety:["礫石惡地陡坡，鬆動砂石易滑倒，穿抓地力好的登山鞋","勿越過護欄進入自然保留區崩崖","全程幾乎無遮蔭，夏天極易中暑","颱風、大雨後崩塌，留意封閉公告"],
  best:[11,12,1,2,3],spring:"4–5 月相思樹開黃花，山頭一片金黃。",summer:"高溫曝曬，不建議。",autumn:"秋高氣爽，峭壁惡地地形最清晰。",winter:"溫度舒適，晴天可遠眺大安溪出海口。",
  maps:[],notice:"",tags:"近郊 惡地 小百岳 馬尾松",xb:35},
-{id:"manabang",name:"馬那邦山",area:"苗栗大湖／泰安",alt:1406,diff:3,driveMin:80,driveVia:"台3 → 卓蘭 → 大湖",nav:"馬那邦山天然湖登山口",
+{id:"manabang",lots:[["馬那邦山 天然湖第二停車場", "100 元", "距登山口約 1.4 km"], ["馬那邦山 天然湖第一停車場", "依現場", "距登山口約 2.4 km"], ["馬那邦山 珠湖登山口", "100 元（私人）", "離山頂較近，可走 O 型"]],name:"馬那邦山",area:"苗栗大湖／泰安",alt:1406,diff:3,driveMin:80,driveVia:"台3 → 卓蘭 → 大湖",nav:"馬那邦山天然湖登山口",
  parking:"天然湖登山口路邊停車，秋季楓紅假日車多，請勿擋住產業道路。",
  length:"天然湖線來回約 6–7 km",lengthKm:6.5,time:"4–5 小時",hours:4.5,stay:"day",stayNote:"當日往返",permit:"免申請",
  safety:["陡坡土徑，雨後泥濘","產業道路狹窄，會車小心","秋季午後易起霧，掌握下山時間"],
  best:[11,12,3,4],spring:"4 月油桐花，步道清幽。",summer:"午後雷陣雨多，宜早出發。",autumn:"11 月下旬至 12 月中旬楓紅，是中部賞楓名山；沿途有日治時期抗日古戰場遺跡。",winter:"偏冷多霧，晴天展望好。",
  maps:[],notice:"",tags:"楓紅 小百岳 古戰場",xb:37},
-{id:"jiali",name:"加里山",area:"苗栗南庄｜鹿場",alt:2220,diff:4,driveMin:110,driveVia:"國1 / 國3 → 頭份 → 南庄 → 苗21",nav:"加里山 鹿場登山口",
+{id:"jiali",lots:[["加里山 鹿場登山口停車場", "100 元／日（私人）", "4 層約 60–70 格；廁所 10 元／次"]],name:"加里山",area:"苗栗南庄｜鹿場",alt:2220,diff:4,driveMin:110,driveVia:"國1 / 國3 → 頭份 → 南庄 → 苗21",nav:"加里山 鹿場登山口",
  parking:"鹿場登山口停車場，假日早滿；苗21 後段山路窄。",
  length:"鹿場線來回約 9 km，爬升約 1,000 m",lengthKm:9,time:"6–7 小時",hours:6.5,stay:"day",stayNote:"當日往返（可住南庄）",permit:"免申請",
  safety:["後段陡升，有拉繩與樹根攀爬","午後常起霧，建議 7 點前起登","寒流期稜線偶有結冰","手機訊號不穩，先下載離線地圖"],
  best:[10,11,12,3,4,5],spring:"杉木林新綠，偶見台灣藍鵲。",summer:"林蔭涼爽但雷陣雨頻繁。",autumn:"晴朗時山頂可遠眺聖稜線與大霸尖山。",winter:"冷，偶有霧凇。",
  maps:[],notice:"",tags:"中級山 小百岳 森林鐵道 聖稜線",xb:34},
-{id:"yuanzui",name:"鳶嘴山",area:"台中和平｜大雪山林道 27K",alt:2180,diff:4,driveMin:100,driveVia:"國4 → 豐原 → 東勢 → 大雪山林道",nav:"鳶嘴山登山口",
+{id:"yuanzui",lots:[["鳶嘴山登山口", "50 元／4 小時（計次）", "27K 停車格約十餘格，假日 8 點後常滿"], ["大雪山林道 27K", "免費", "沿林道白線處停放"]],name:"鳶嘴山",area:"台中和平｜大雪山林道 27K",alt:2180,diff:4,driveMin:100,driveVia:"國4 → 豐原 → 東勢 → 大雪山林道",nav:"鳶嘴山登山口",
  parking:"27K 登山口停車格約十餘格（計次 50 元／4 小時），假日 8 點後沿林道白線處停放；登山口對面有公廁（沿途唯一）。",
  length:"環形步道約 2.1 km（可再串稍來山縱走）",lengthKm:2.1,time:"3.5–4 小時",hours:4,stay:"day",stayNote:"當日往返",permit:"免申請（進入大雪山林道上段需付遊樂區費用）",
  safety:["岩稜段需拉繩攀爬，保持三點不動，戴手套","下雨、強風或岩面潮濕不要上岩稜","有懼高症者慎行","林道落石，行車注意"],
  best:[10,11,12,3,4,5],spring:"4–5 月岩壁上的西施花（粉紅杜鵑）盛開。",summer:"清晨雲海機會高，午後雷雨前下山。",autumn:"天氣穩，展望好，可眺雪山山脈。",winter:"寒流後岩面結霜，非常危險。",
  maps:[],notice:"",tags:"岩稜 西施花 雲海 中級山"},
-{id:"shaolai",name:"稍來山・小雪山（大雪山森林遊樂區）",area:"台中和平｜大雪山林道上段",alt:2307,diff:2,driveMin:120,driveVia:"國4 → 東勢 → 大雪山林道",nav:"大雪山國家森林遊樂區",
+{id:"shaolai",lots:[["大雪山國家森林遊樂區", "小型車 100 元", "買電子門票可免停車費；門票假日 200 元"], ["稍來山登山口", "免費", "林道路邊，車位有限"]],name:"稍來山・小雪山（大雪山森林遊樂區）",area:"台中和平｜大雪山林道上段",alt:2307,diff:2,driveMin:120,driveVia:"國4 → 東勢 → 大雪山林道",nav:"大雪山國家森林遊樂區",
  parking:"稍來山登山口路邊停車；遊樂區內另有收費停車場（35K 收費站購票）。",
  length:"稍來山來回約 3–4 km；天池、神木步道各 1 km 內",lengthKm:3.5,time:"2–3 小時",hours:2.5,stay:"opt",stayNote:"可住遊樂區木屋",permit:"免申請（遊樂區門票）",
  safety:["海拔 2,000 m 以上溫差大，帶保暖外套","林道落石、起霧時能見度低","冬季偶降雪，林道可能管制"],
  best:[3,4,5,10,11,12],spring:"4 月紅榨槭新芽與杜鵑。",summer:"避暑勝地，清晨可見帝雉、藍腹鷴。",autumn:"11–12 月青楓、紅榨槭轉紅。",winter:"寒流時小雪山可能降雪。",
  maps:[],notice:"",tags:"小百岳 楓紅 賞鳥 帝雉 親子",xb:39},
-{id:"baxian",name:"八仙山主峰",area:"台中和平｜八仙山國家森林遊樂區",alt:2366,diff:5,driveMin:100,driveVia:"國4 → 東勢 → 台8 往谷關",nav:"八仙山國家森林遊樂區",
+{id:"baxian",lots:[["八仙山國家森林遊樂區", "小型車 100 元", "買電子門票可免停車費；開放 07:00–17:00"]],name:"八仙山主峰",area:"台中和平｜八仙山國家森林遊樂區",alt:2366,diff:5,driveMin:100,driveVia:"國4 → 東勢 → 台8 往谷關",nav:"八仙山國家森林遊樂區",
  parking:"遊樂區停車場（需購門票），開放 07:00–17:00。",
  length:"主峰步道來回約 9–10 km，爬升約 1,500 m",lengthKm:9.5,time:"7–8 小時",hours:7.5,stay:"day",stayNote:"當日往返（需趕在 17:00 閉園前）",permit:"免申請（遊樂區門票）",
  safety:["一路陡上，體力與膝蓋負擔大，建議帶登山杖","7 點入園即起登，否則來不及在閉園前下山","冬季天黑早，必帶頭燈"],
  best:[10,11,12,3,4],spring:"新綠與山櫻。",summer:"遊樂區溪邊避暑（週四親水區維護暫停）。",autumn:"楓葉轉色，空氣清透。",winter:"寒冷，主峰偶結霜。",
  maps:[{t:"健行筆記：八仙山步道群",u:"https://hiking.biji.co/index.php?q=trail&act=detail&id=260"},{t:"台中分署：遊樂區公告",u:"https://taichung.forest.gov.tw/0000161"}],
  notice:"主峰登山口前動線改善施工，步道仍可通行，依現場指示行走（預計 115/11/20 完工）。",tags:"谷關七雄 老大 中級山 體能",gk:1},
-{id:"malun",name:"馬崙山",area:"台中和平｜谷關（台8線 36.2K）",alt:2305,diff:5,driveMin:100,driveVia:"國4 → 東勢 → 台8 往谷關",nav:"馬崙山登山口",
- parking:"登山口在台8線約 36.2K，路旁車位很少；可停谷關溫泉區收費停車場再步行至登山口。",
+{id:"malun",lots:[["馬崙山登山口", "免費", "東關一路台電巷，路邊停車，車位很少"], ["谷關溫泉區停車場", "依現場", "滿位時的備案"]],name:"馬崙山",area:"台中和平｜谷關（台8線 36.2K）",alt:2305,diff:5,driveMin:100,driveVia:"國4 → 東勢 → 台8 往谷關",nav:"馬崙山登山口",
+ parking:"登山口在東關一路台電巷（台8線約 36K 一帶），只能路邊停車，車位很少；滿了停谷關溫泉區再步行。",
  length:"單程約 7 km，爬升約 1,100 m，來回約 14 km",lengthKm:14,time:"7–8 小時",hours:7.5,stay:"day",stayNote:"當日往返（可住谷關溫泉）",permit:"免申請",
  safety:["1.6K 往「五葉松媽媽」方向的便橋遭落石損壞，暫停通行，請改走「八勇士」方向","路程長，建議 6 點前起登，帶頭燈","後段陡坡與拉繩段，下坡注意膝蓋"],
  best:[10,11,12,3,4],spring:"3–4 月山櫻、杜鵑與新綠。",summer:"悶熱多午後雷雨，下山可泡谷關溫泉。",autumn:"天氣穩，山頂可望雪山山脈。",winter:"2,300 m 山頂寒冷，天黑早。",
  maps:[{t:"山林悠遊網：馬崙山步道",u:"https://recreation.forest.gov.tw/Trail/RT?tr_id=057"},{t:"健行筆記：馬崙山步道",u:"https://hiking.biji.co/index.php?q=trail&act=detail&id=267"}],
  notice:"部分開放（公告期間 2025/2/17–2028/6/30）：五葉松媽媽方向便橋暫停通行，改走八勇士方向。",tags:"谷關七雄 老二 中級山 體能 溫泉",gk:2},
-{id:"wuwowei",name:"屋我尾山",area:"台中和平｜大雪山林道 31.2K",alt:1796,diff:3,driveMin:105,driveVia:"國4 → 東勢 → 大雪山林道",nav:"屋我尾山北登山口",
+{id:"wuwowei",lots:[["屋我尾山北登山口", "50 元／4 小時（計次）", "林道 31.2K 約 4 格"], ["大雪山林道 31K", "免費", "沿林道白線處停放"]],name:"屋我尾山",area:"台中和平｜大雪山林道 31.2K",alt:1796,diff:3,driveMin:105,driveVia:"國4 → 東勢 → 大雪山林道",nav:"屋我尾山北登山口",
  parking:"林道 31.2K 北登山口約 4 個車位（計次 50 元／4 小時），停滿可停林道白線處。",
  length:"北登山口單程 2.3 km（先下坡再登頂）；南口自台8線 31.2K 上，單程 3.8 km 較陡",lengthKm:4.6,time:"北口來回 3–4 小時",hours:3.5,stay:"day",stayNote:"當日往返",permit:"免申請",
  safety:["多段陡坡有拉繩，慢走","北口路線回程是上坡，保留體力","林道落石、起霧時開車小心","可與鳶嘴山（27K）同日安排"],
  best:[10,11,12,3,4,5],spring:"4–5 月杜鵑。",summer:"林蔭涼爽，午後起霧。",autumn:"晴天展望好，常見雲海。",winter:"寒流期林道與岩面結霜。",
  maps:[{t:"山林悠遊網：屋我尾山步道",u:"https://recreation.forest.gov.tw/Trail/RT?tr_id=056"}],
  notice:"",tags:"谷關七雄 老三 大雪山 雲海",gk:3},
-{id:"bojinjia",name:"波津加山",area:"台中和平｜谷關溫泉區",alt:1772,diff:4,driveMin:95,driveVia:"國4 → 東勢 → 台8 34.5K 過谷關大橋",nav:"四季溫泉會館 谷關",
+{id:"bojinjia",lots:[["四季溫泉會館 谷關", "免費", "溫泉巷兩旁，8 點前較有位"], ["谷關溫泉區收費停車場", "依現場", "滿位時的備案"]],name:"波津加山",area:"台中和平｜谷關溫泉區",alt:1772,diff:4,driveMin:95,driveVia:"國4 → 東勢 → 台8 34.5K 過谷關大橋",nav:"四季溫泉會館 谷關",
  parking:"由捎來步道東入口起登，車停溫泉巷兩旁（8 點前較有位），否則停街上收費停車場。",
  length:"捎來步道東入口 0.6 km＋波津加步道 3.6 km，來回約 8.4 km，爬升約 960 m",lengthKm:8.4,time:"6–7 小時",hours:6.5,stay:"day",stayNote:"當日往返（可住谷關溫泉）",permit:"免申請",
  safety:["綽號「坡真陡」，一路陡上不停","碎石坡段易滑，下坡用登山杖","沿途無水源，帶 2 公升水"],
  best:[10,11,12,1,2,3,4],spring:"4 月稜線杜鵑花。",summer:"悶熱，不建議。",autumn:"天氣穩，可回程走捎來吊橋。",winter:"涼爽最適合。",
  maps:[{t:"山林悠遊網：波津加山步道",u:"https://recreation.forest.gov.tw/Trail/RT?tr_id=055"},{t:"健行筆記：波津加山步道",u:"https://hiking.biji.co/index.php?q=trail&act=detail&id=271"}],
  notice:"",tags:"谷關七雄 老四 溫泉 捎來吊橋 杜鵑",gk:4},
-{id:"dongmao",name:"東卯山",area:"台中和平｜谷關",alt:1690,diff:4,driveMin:95,driveVia:"國4 → 東勢 → 台8 往谷關",nav:"谷關大道院",
+{id:"dongmao",lots:[["谷關大道院", "依現場", "停車後走約 1 km 產業道路到步道口"]],name:"東卯山",area:"台中和平｜谷關",alt:1690,diff:4,driveMin:95,driveVia:"國4 → 東勢 → 台8 往谷關",nav:"谷關大道院",
  parking:"谷關大道院停車場（登東卯山停車處）。",
  length:"單程約 6.7 km，來回約 13.4 km",lengthKm:13.4,time:"5–6 小時",hours:5.5,stay:"day",stayNote:"當日往返",permit:"免申請",
  safety:["距離長，掌握折返時間","後段陡坡拉繩","另有東南稜路線難度高，新手走一般路線"],
  best:[10,11,12,1,2,3,4],spring:"3–4 月杜鵑、山櫻。",summer:"悶熱多雷雨。",autumn:"秋高氣爽，可俯瞰谷關溪谷。",winter:"涼爽，帶頭燈。",
  maps:[],notice:"",tags:"谷關七雄 老五",gk:5},
-{id:"tangmadan",name:"唐麻丹山",area:"台中和平｜谷關（台8線 26–29K）",alt:1305,diff:3,driveMin:85,driveVia:"國4 → 東勢 → 台8",nav:"唐麻丹山登山口 裡冷",
+{id:"tangmadan",lots:[["唐麻丹山登山口 裡冷", "約 100 元", "台8線 26K"], ["唐麻丹山 松鶴登山口", "免費", "台8線 29K 路邊"]],name:"唐麻丹山",area:"台中和平｜谷關（台8線 26–29K）",alt:1305,diff:3,driveMin:85,driveVia:"國4 → 東勢 → 台8",nav:"唐麻丹山登山口 裡冷",
  parking:"裡冷部落登山口（台8線 26K）或松鶴部落登山口（台8線 29K），路邊停車。",
  length:"O 型全程約 5.1 km",lengthKm:5.1,time:"4–5 小時",hours:4.5,stay:"day",stayNote:"當日往返",permit:"免申請",
  safety:["陡坡拉繩，雨後土徑濕滑","兩個登山口不同，O 型走完需回到停車處"],
  best:[10,11,12,1,2,3,4],spring:"新綠與蝴蝶。",summer:"悶熱，曾因颱風豪雨暫停開放。",autumn:"天氣穩定。",winter:"涼爽最適合，七雄入門首選。",
  maps:[{t:"山林悠遊網：唐麻丹山步道",u:"https://recreation.forest.gov.tw/Trail/RT?tr_id=054"},{t:"健行筆記：唐麻丹山步道",u:"https://hiking.biji.co/index.php?q=trail&act=detail&id=263"}],
  notice:"2026/6/27–8/30 曾暫停開放（含蝴蝶谷步道），出發前請到山林悠遊網確認已恢復開放。",tags:"谷關七雄 老六 入門",gk:6},
-{id:"baimao",name:"白毛山",area:"台中和平｜台8線 19.9K 白鹿吊橋",alt:1522,diff:3,driveMin:75,driveVia:"國4 → 東勢 → 台8",nav:"白鹿吊橋",
+{id:"baimao",lots:[["白鹿吊橋", "免費", "吊橋旁路邊；往谷關方向 200 m 右側也有車位"], ["白毛山第二登山口", "免費", "產業道路窄，可省 2.7 km"]],name:"白毛山",area:"台中和平｜台8線 19.9K 白鹿吊橋",alt:1522,diff:3,driveMin:75,driveVia:"國4 → 東勢 → 台8",nav:"白鹿吊橋",
  parking:"白鹿吊橋附近路邊停車；也可開產業道路到第二登山口，省下 2.7 km。",
  length:"白鹿吊橋起單程 4.9 km（至第二登山口 2.7 km＋登頂 2.2 km），爬升約 950 m",lengthKm:9.8,time:"5–6 小時",hours:5.5,stay:"day",stayNote:"當日往返",permit:"免申請",
  safety:["後段 2.2 km 陡升","往第二登山口的產業道路窄，會車小心"],
  best:[10,11,12,1,2,3,4],spring:"3–4 月新綠。",summer:"悶熱多雷雨。",autumn:"晴天可望大甲溪谷。",winter:"涼爽最適合。",
  maps:[{t:"山林悠遊網：白毛山步道",u:"https://recreation.forest.gov.tw/Trail/RT?tr_id=059"},{t:"健行筆記：白毛山步道",u:"https://hiking.biji.co/index.php?q=trail&act=detail&id=266"}],
  notice:"全線開放。",tags:"谷關七雄 老么",gk:7},
-{id:"xitou",name:"溪頭自然教育園區",area:"南投鹿谷",alt:1150,diff:1,driveMin:75,driveVia:"國3 → 竹山 → 投151",nav:"溪頭自然教育園區",
+{id:"xitou",lots:[["溪頭自然教育園區 第一停車場", "每小時 50 元，每日上限 180 元", "不分平假日"], ["溪頭自然教育園區 第二停車場", "平日 40 元／時、假日 50 元／時，上限 180 元", "第三停車場同價"]],name:"溪頭自然教育園區",area:"南投鹿谷",alt:1150,diff:1,driveMin:75,driveVia:"國3 → 竹山 → 投151",nav:"溪頭自然教育園區",
  parking:"園區收費停車場，假日 9 點後入園車潮塞到鹿谷，早到為佳。",
  length:"大學池、神木、空中走廊環線約 5–6 km",lengthKm:5.5,time:"2–3 小時",hours:2.5,stay:"opt",stayNote:"可住園區旅館",permit:"免申請（園區門票）",
  safety:["午後常起霧、降溫快","木棧道潮濕易滑"],
  best:[1,2,3,4,5,6,7,8,9,10,11,12],spring:"3–4 月柳杉林新綠，4–5 月夜間有螢火蟲。",summer:"均溫 20°C 左右，避暑首選。",autumn:"11–12 月銀杏林轉黃。",winter:"霧林氣氛，帶外套。",
  maps:[],notice:"",tags:"親子 輕鬆 銀杏 森林浴"},
-{id:"shanlinxi",name:"杉林溪（松瀧岩・青龍瀑布）",area:"南投竹山",alt:1600,diff:1,driveMin:105,driveVia:"國3 → 竹山 → 投151 經溪頭續行",nav:"杉林溪森林生態渡假園區",
+{id:"shanlinxi",lots:[["杉林溪森林生態渡假園區", "100 元／日", "2026/1/1 起；另需門票"]],name:"杉林溪（松瀧岩・青龍瀑布）",area:"南投竹山",alt:1600,diff:1,driveMin:105,driveVia:"國3 → 竹山 → 投151 經溪頭續行",nav:"杉林溪森林生態渡假園區",
  parking:"園區購票後停園區停車場；花季週末大塞車。",
  length:"步道群單條 1–3 km，可組合 3–6 km",lengthKm:4,time:"2–4 小時",hours:3,stay:"opt",stayNote:"可住園區飯店",permit:"免申請（園區門票）",
  safety:["瀑布區濕滑","山路彎多易暈車"],
  best:[3,4,5,6],spring:"3–4 月牡丹花季。",summer:"5–6 月繡球花，避暑。",autumn:"楓紅點綴，人潮少。",winter:"寒流期可能結霜。",
  maps:[],notice:"",tags:"親子 輕鬆 牡丹 繡球花 瀑布"},
-{id:"shuishe",name:"水社大山",area:"南投魚池｜日月潭",alt:2059,diff:4,driveMin:80,driveVia:"國6 → 埔里 → 台21",nav:"水社大山登山口",
- parking:"登山口一帶路邊或附近停車場（日月潭朝霧碼頭方向），假日早到。",
+{id:"shuishe",lots:[["日月潭青年活動中心", "120 元", "園內消費 200 元可折抵；登山口在停車場旁約 60 m"], ["伊達邵停車場", "依現場", "走伊達邵登山口，1.6 km 處與青年活動中心線會合"]],name:"水社大山",area:"南投魚池｜日月潭",alt:2059,diff:4,driveMin:80,driveVia:"國6 → 埔里 → 台21",nav:"日月潭青年活動中心",
+ parking:"多數人從日月潭青年活動中心起登，停車方便；也可從伊達邵登山口上。",
  length:"來回約 10 km，爬升約 1,300 m",lengthKm:10,time:"6–8 小時",hours:7,stay:"day",stayNote:"當日往返（可住日月潭）",permit:"免申請",
  safety:["長距離陡升，後段有拉繩","沿途無水源，至少帶 2 公升","冬季下午 5 點天黑，帶頭燈"],
  best:[10,11,12,1,2,3,4],spring:"春季霧多，稜線清涼。",summer:"炎熱且午後雷雨，不建議。",autumn:"晴朗時可俯瞰整座日月潭與中央山脈。",winter:"晴天展望最好，早晨常有雲海。",
  maps:[],notice:"",tags:"日月潭 雲海 體能"},
-{id:"hehuan",name:"合歡山 石門山・主峰・東峰",area:"南投仁愛｜台14甲線",alt:3421,diff:2,driveMin:165,driveVia:"國6 → 埔里 → 台14 → 台14甲（清境）",nav:"武嶺停車場",
+{id:"hehuan",lots:[["武嶺停車場", "平日 50 元／時、假日 60 元／時，每日上限 300 元", "主峰；昆陽停車場同價"], ["合歡山莊 停車場", "同上", "東峰、石門山；松雪樓停車場同價"]],name:"合歡山 石門山・主峰・東峰",area:"南投仁愛｜台14甲線",alt:3421,diff:2,driveMin:165,driveVia:"國6 → 埔里 → 台14 → 台14甲（清境）",nav:"武嶺停車場",
  parking:"主峰停昆陽或武嶺停車場；東峰、石門山停合歡山莊或松雪樓停車場。平日 50 元／時、假日 60 元／時，每日上限 300 元。",
  length:"石門山來回約 1.6 km；主峰來回約 4.8 km（水泥路）；東峰來回約 2.4 km",lengthKm:4.8,time:"每座 1–3 小時，可一天連走三座",hours:5,stay:"opt",stayNote:"可住松雪樓、合歡山莊或清境",permit:"免申請",
  safety:["一天內從平地上到 3,000 m 以上，頭痛、噁心就下撤","紫外線強，午後易起霧與雷擊","冬季積雪時台14甲交通管制，需雪鏈與冰爪"],
  best:[5,6,9,10,11],spring:"5 月底至 6 月中玉山杜鵑、紅毛杜鵑盛開。",summer:"高山野花，午後雷雨前完成。",autumn:"芒草、晴朗星空（合歡山暗空公園）。",winter:"寒流可能降雪，路面結冰。",
  maps:[{t:"Hikingbook：合歡群峰 7 條路線",u:"https://hikingbook.net/"}],notice:"",tags:"百岳 入門 杜鵑 星空 雪景"},
-{id:"hehuannorth",name:"合歡北峰",area:"南投仁愛｜小風口",alt:3422,diff:3,driveMin:165,driveVia:"國6 → 埔里 → 台14甲",nav:"小風口停車場",
+{id:"hehuannorth",lots:[["小風口停車場", "平日 40 元／時、假日 60 元／時，每日上限 300 元", "機車需 10 元硬幣 2 枚"]],name:"合歡北峰",area:"南投仁愛｜小風口",alt:3422,diff:3,driveMin:165,driveVia:"國6 → 埔里 → 台14甲",nav:"小風口停車場",
  parking:"小風口停車場：平日 40 元／時、假日 60 元／時，每日上限 300 元；機車需 10 元硬幣。",
  length:"來回約 4 km，爬升約 450 m",lengthKm:4,time:"3–4 小時",hours:3.5,stay:"day",stayNote:"當日往返",permit:"免申請",
  safety:["前段連續陡坡，慢步調避免高山症","稜線強風、無遮蔽","冬季積雪結冰需冰爪"],
  best:[5,6,10,11],spring:"6 月紅毛杜鵑滿坡，最熱門季節。",summer:"高山花草，午後雷雨。",autumn:"箭竹草原轉金黃、雲海。",winter:"雪景美但需冰爪與雪地經驗。",
  maps:[],notice:"",tags:"百岳 入門 杜鵑 雲海"},
-{id:"nenggao",name:"奇萊南華（天池山莊・能高瀑布）",area:"南投仁愛｜能高越嶺道西段",alt:3358,diff:4,driveMin:150,driveVia:"國6 → 埔里 → 台14 霧社 → 投83 往屯原",nav:"屯原登山口",
+{id:"nenggao",lots:[["屯原登山口", "依現場", "林業保育署設置的三處停車場，約 40–50 格；請勿亂停"], ["雲天宮登山口", "—", "再往上 1.4 km，需先到服務站報到、聽安全說明"]],name:"奇萊南華（天池山莊・能高瀑布）",area:"南投仁愛｜能高越嶺道西段",alt:3358,diff:4,driveMin:150,driveVia:"國6 → 埔里 → 台14 霧社 → 投83 往屯原",nav:"屯原登山口",
  parking:"屯原三處停車場約 40–50 輛，假日不夠停；Google 地圖上的「屯原登山口」是舊口，新登山口在第三停車場旁，雲天宮登山口再往上 1.4 km。道路窄、會車困難。",
  length:"雲天宮線至天池山莊單程約 13.5–14.3 km；全程約 36 km",lengthKm:36,time:"2 天 1 夜或 3 天 2 夜",hours:30,stay:"need",stayNote:"天池山莊（住宿日前 60 日至前 5 日 15:00 申請）",permit:"入山證＋天池山莊床位",
  safety:["原屯原 0–3K 崩塌已封閉，一律走雲天宮線","落石路段快速通過，不要停留","天池山莊通訊可能中斷，行程交代清楚","冬季稜線積雪需冰爪"],
  best:[10,11,12,5,6],spring:"5–6 月杜鵑，能高瀑布水量大。",summer:"午後雷雨，宜早出發早抵達。",autumn:"10–12 月南華山箭竹草原轉金黃，天池山莊前常見雲瀑。",winter:"可能降雪，需雪地裝備。",
  maps:[{t:"健行筆記：能高越嶺道",u:"https://hiking.biji.co/index.php?q=trail&act=detail&id=291"},{t:"山林悠遊網：能高越嶺道西段",u:"https://recreation.forest.gov.tw/Trail/RT?tr_id=064"},{t:"天池山莊申請",u:"https://tconline.forest.gov.tw/room/"}],
  notice:"屯原舊登山口 0–3K 已封閉，改走雲天宮線；115 年 1 月起雲天宮線入口全面開放。",tags:"百岳 山屋 草原 雲瀑 能高瀑布"},
-{id:"qilai",name:"奇萊主北",area:"南投仁愛／花蓮秀林｜太魯閣國家公園",alt:3607,diff:5,driveMin:165,driveVia:"國6 → 埔里 → 台14甲（滑雪山莊叉路）",nav:"奇萊登山口 合歡山",
+{id:"qilai",lots:[["合歡山莊 停車場", "平日 50 元／時、假日 60 元／時，每日上限 300 元", "多日停車約 600–900 元，可考慮包車"], ["松雪樓停車場", "同上", "按對講機請人員開柵欄"]],name:"奇萊主北",area:"南投仁愛／花蓮秀林｜太魯閣國家公園",alt:3607,diff:5,driveMin:165,driveVia:"國6 → 埔里 → 台14甲（滑雪山莊叉路）",nav:"奇萊登山口 合歡山",
  parking:"登山口在台14甲滑雪山莊叉路附近；車停松雪樓／合歡山莊收費停車場，多日停車費較高，可考慮包車接駁。",
  length:"全程約 20–24 km（登山口至成功山屋 4.8 km）",lengthKm:22,time:"2 天 1 夜或 3 天 2 夜",hours:24,stay:"need",stayNote:"成功山屋（34 床，先搶先贏）或奇萊山屋（2026/8 試營運，40 床）",permit:"太魯閣國家公園入園許可＋入山證（入園日前 5 日至 2 個月申請）",
  safety:["「黑色奇萊」稜線天氣多變，易迷霧失溫","北峰有拉繩陡岩","雷擊風險高，午後前離開稜線","需具 3,000 m 經驗與完整保暖裝備"],
  best:[10,11,4,5],spring:"4–5 月天氣轉穩，杜鵑陸續開。",summer:"颱風與午後雷雨期，慎選日子。",autumn:"10–11 月最穩定，奇萊稜線大景。",winter:"雪攀等級，需專業裝備與經驗。",
  maps:[{t:"健行筆記：奇萊主北",u:"https://hiking.biji.co/index.php?q=trail&act=detail&id=542"},{t:"太魯閣登山須知",u:"https://hike.taiwan.gov.tw/notice_a4.aspx"}],
  notice:"新奇萊山屋（海拔 3,345 m）2026/8/21 起試營運，需事先申請床位；未取得床位依核准範圍搭帳。",tags:"百岳 進階 黑色奇萊 山屋"},
-{id:"xue",name:"雪山主東",area:"台中和平｜雪霸國家公園（武陵）",alt:3886,diff:4,driveMin:255,driveVia:"國6 → 台14甲（合歡）→ 大禹嶺 → 台8 → 梨山 → 台7甲；或國3／國5 經宜蘭",nav:"雪山登山口 武陵",
+{id:"xue",lots:[["武陵農場 雪山登山口", "入園車輛費小型車 50 元＋門票", "可開到登山口；或搭北谷遊園巴士 200 元／人"]],name:"雪山主東",area:"台中和平｜雪霸國家公園（武陵）",alt:3886,diff:4,driveMin:255,driveVia:"國6 → 台14甲（合歡）→ 大禹嶺 → 台8 → 梨山 → 台7甲；或國3／國5 經宜蘭",nav:"雪山登山口 武陵",
  parking:"雪山登山口停車場（需付武陵農場門票），報到後起登。",
  length:"單程 10.9 km（登山口→七卡山莊 2 km→369 約 7.15 km），來回約 21.8 km",lengthKm:21.8,time:"2 天 1 夜或 3 天 2 夜",hours:24,stay:"need",stayNote:"七卡山莊；三六九山莊改建中，改住三六九臨時營地（24 營位，先搶先贏）",permit:"雪霸國家公園入園申請（入園前 5 日至 2 個月，與床位綁定），免入山證",
  safety:["「哭坡」陡上，黑森林岔路多易迷途","冬季（約 1–3 月）圈谷積雪需雪地裝備與審查","颱風或豪雨後常封園"],
  best:[10,11,4,5],spring:"4–5 月圈谷殘雪與杜鵑。",summer:"圈谷高山花草，雷雨多。",autumn:"10–11 月天氣最穩，台灣第二高峰大景。",winter:"雪攀季，限有雪地經驗者。",
  maps:[{t:"雪霸國家公園入園申請",u:"https://hike.taiwan.gov.tw/"}],
  notice:"雪霸 2026/8/29 全面恢復開放。另有「登山口至七卡山莊」單日往返健行，每日 80 名額隨到隨辦。",tags:"百岳 圈谷 營地 台灣第二高峰"},
-{id:"yushan",name:"玉山主峰",area:"南投信義／嘉義阿里山｜玉山國家公園塔塔加",alt:3952,diff:4,driveMin:180,driveVia:"國3 → 竹山 → 台16 水里 → 台21 新中橫",nav:"上東埔停車場",
- parking:"停上東埔停車場，於排雲登山服務中心報到查驗證件，再搭接駁車到塔塔加登山口（06:30–17:00，單程 100 元／人）。",
+{id:"yushan",lots:[["上東埔停車場", "小型車 40 元／時，單日上限 200 元", "2 天行程約 400 元；接駁車到登山口單程 100–150 元／人"]],name:"玉山主峰",area:"南投信義／嘉義阿里山｜玉山國家公園塔塔加",alt:3952,diff:4,driveMin:180,driveVia:"國3 → 竹山 → 台16 水里 → 台21 新中橫",nav:"上東埔停車場",
+ parking:"停上東埔停車場，於排雲登山服務中心報到查驗證件，再搭接駁車到塔塔加登山口（06:30–17:00，現金，依現場公告）。",
  length:"來回 21.8 km（登山口→排雲山莊 8.5 km，→主峰 2.4 km）",lengthKm:21.8,time:"2 天 1 夜",hours:20,stay:"need",stayNote:"排雲山莊（抽籤，入園前一個月公告）",permit:"玉山國家公園入園許可＋入山許可",
  safety:["高山症：第一天慢走，多喝水","主峰前碎石坡與鐵鍊段，強風時壓低重心","冬季積雪期需冰爪並符合雪季規定"],
  best:[10,11,3,4,5],spring:"4–5 月玉山杜鵑。",summer:"颱風與午後雷雨，留意封山公告。",autumn:"最穩定季節，主峰日出成功率高。",winter:"雪季需雪地裝備。",
  maps:[{t:"玉管處：交通方式",u:"https://www.ysnp.gov.tw/Trail/7fa5c242-df1a-4a8e-bcab-32dc55b1f7b6?Tab=4"}],
  notice:"",tags:"百岳 台灣最高峰 山屋 日出"},
-{id:"linzhi",name:"麟趾山・鹿林山（塔塔加）",area:"南投信義｜塔塔加遊憩區",alt:2854,diff:2,driveMin:180,driveVia:"國3 → 竹山 → 台16 → 台21",nav:"塔塔加遊客中心",
+{id:"linzhi",lots:[["上東埔停車場", "小型車 40 元／時，單日上限 200 元", "麟趾山登山口就在旁邊"], ["塔塔加遊客中心", "依現場", "鹿林山方向"]],name:"麟趾山・鹿林山（塔塔加）",area:"南投信義｜塔塔加遊憩區",alt:2854,diff:2,driveMin:180,driveVia:"國3 → 竹山 → 台16 → 台21",nav:"塔塔加遊客中心",
  parking:"塔塔加遊客中心或上東埔停車場。",
  length:"O 型約 5–7 km",lengthKm:6,time:"3–4 小時",hours:3.5,stay:"day",stayNote:"當日往返（可住東埔或鹿林山莊）",permit:"免申請",
  safety:["近 3,000 m，留意高山症","午後起霧，岔路多看指標"],
  best:[4,5,10,11,12],spring:"4–5 月玉山杜鵑。",summer:"涼爽避暑，午後霧。",autumn:"雲海，可正面遠眺玉山主峰與前峰。",winter:"寒流偶積雪。",
  maps:[],notice:"",tags:"輕鬆 玉山展望 雲海 杜鵑"},
-{id:"alishan",name:"阿里山 祝山・對高岳",area:"嘉義阿里山｜阿里山國家森林遊樂區",alt:2489,diff:2,driveMin:180,driveVia:"國3 → 嘉義 → 台18；或經塔塔加",nav:"阿里山國家森林遊樂區",
+{id:"alishan",lots:[["阿里山國家森林遊樂區", "小型車 100 元", "買電子門票可免停車費；全票 300 元、本國籍 200 元"]],name:"阿里山 祝山・對高岳",area:"嘉義阿里山｜阿里山國家森林遊樂區",alt:2489,diff:2,driveMin:180,driveVia:"國3 → 嘉義 → 台18；或經塔塔加",nav:"阿里山國家森林遊樂區",
  parking:"遊樂區停車場（需門票），看日出要凌晨抵達或前一晚住園區。",
  length:"祝山觀日步道接對高岳約 5 km",lengthKm:5,time:"2–3 小時",hours:2.5,stay:"opt",stayNote:"建議前一晚住園區或奮起湖",permit:"免申請（遊樂區門票）",
  safety:["凌晨氣溫低，帶保暖衣物與頭燈","花季人潮擁擠"],
  best:[3,4,10,11,12],spring:"3–4 月吉野櫻花季。",summer:"避暑，清晨雲海。",autumn:"日出與雲海機率高。",winter:"晴朗乾冷，偶結霜。",
  maps:[],notice:"",tags:"日出 雲海 櫻花 神木 輕鬆"},
-{id:"jiaming",name:"嘉明湖（向陽山・三叉山）",area:"台東海端｜南橫向陽",alt:3603,diff:4,driveMin:330,driveVia:"國3 → 國10 → 台20 南橫（甲仙 → 梅山口 → 向陽）",nav:"向陽國家森林遊樂區",
- parking:"向陽國家森林遊樂區停車場；南橫梅山口–向陽為有條件通行。",
+{id:"eryanping",lots:[["隙頂停車場","收費（2025 年起）","約 20 格，假日早滿"],["二延平步道","免費","台18線 53.5K 步道口路邊，注意來車"]],name:"二延平步道",area:"嘉義番路｜阿里山公路（台18）53.5K",alt:1100,altNote:"約",diff:1,driveMin:110,driveVia:"國3 / 國1 → 嘉義 → 台18 阿里山公路",nav:"隙頂停車場",
+ parking:"隙頂停車場約 20 格，2025 年起收費；多數車停台18 路邊，旺季與看夕陽時段要早到。",
+ length:"單程約 1 km（步道口→觀景平台 1→觀景平台 2→二延平山），來回約 2 km",lengthKm:2,time:"來回 40 分鐘–1.5 小時",hours:1.2,stay:"opt",stayNote:"可住隙頂、石棹民宿看隔天日出",permit:"免申請",
+ safety:["階梯多但平緩，適合新手與長輩","看完夕陽天很快暗，帶頭燈","台18 路邊停車與步行注意來車"],
+ best:[10,11,12,1,2,3],spring:"茶園新芽，3 月偶見山櫻。",summer:"午後常起霧下雨，傍晚可能放晴看夕陽。",autumn:"10 月起進入雲海季，傍晚雲瀑機率高。",winter:"雲海與金黃夕照最穩定，是最佳季節。",
+ maps:[{t:"健行筆記：二延平步道",u:"https://hiking.biji.co/index.php?q=trail&act=detail&id=410"}],notice:"",tags:"嘉義 阿里山 雲海 夕陽 茶園 輕鬆 親子"},
+{id:"dingshizhuo",lots:[["石棹資訊站","依現場","約 17 格，最大的停車點"],["頂石棹步道群 霧之道入口","依現場","約 7 格"],["頂石棹步道群 茶之道","依現場","霧之道／茶之道出口，約 4 格"]],name:"頂石棹步道群（霧・茶・雲・霞・櫻之道）",area:"嘉義竹崎｜阿里山公路（台18）63.5K",alt:1500,altNote:"約",diff:1,driveMin:120,driveVia:"國3 / 國1 → 嘉義 → 台18 阿里山公路",nav:"石棹資訊站",
+ parking:"三處小停車點合計約 28 格，霞之道附近只能路邊臨停；看日出要天亮前抵達。",
+ length:"5 條步道各約 0.3–1 km，可串成 O 型約 3 km",lengthKm:3,time:"1–2 小時",hours:1.5,stay:"opt",stayNote:"可住石棹、奮起湖民宿",permit:"免申請",
+ safety:["木棧道與石階潮濕易滑","茶園是私人產業，不要踩進茶樹間","台18 山路彎多，清晨起霧開車慢行"],
+ best:[2,3,10,11,12,1],spring:"2–3 月櫻之道櫻花盛開，茶園一片翠綠。",summer:"午後起霧，清晨走最涼爽。",autumn:"雲海季開始，霞之道看日出。",winter:"日出、雲海、茶園三合一的季節。",
+ maps:[{t:"健行筆記：頂石棹步道群",u:"https://hiking.biji.co/index.php?q=trail&act=detail&id=457"}],notice:"",tags:"嘉義 阿里山 茶園 櫻花 雲海 日出 輕鬆 親子"},
+{id:"fenqihu",lots:[["多林公有停車場","免費","兩處約 58 格，對面是多林登山口"],["頂湖自然生態公園","免費","頂湖廣場旁約 20 格"],["奮起湖第一停車場","收費（2025 年起）","逛老街用；第二、三停車場同"]],name:"奮起湖・大凍山",area:"嘉義竹崎｜奮起湖",alt:1976,diff:3,driveMin:130,driveVia:"國3 / 國1 → 嘉義 → 台18 → 169 縣道",nav:"多林公有停車場",
+ parking:"登山停多林或頂湖兩處免費停車場，兩處都有廁所；奮起湖老街停車場 2025 年起收費。",
+ length:"頂湖登山口單程約 50 分鐘；C 線環狀約 3.3 km",lengthKm:3.3,time:"2–3 小時",hours:2.5,stay:"opt",stayNote:"可住奮起湖",permit:"免申請",
+ safety:["石階陡，雨後濕滑","霧多，岔路看清指標","冬季山頂偶結霜"],
+ best:[3,4,10,11,12,1],spring:"3–4 月奮起湖一帶山櫻，柳杉林新綠。",summer:"林蔭避暑，下山吃奮起湖便當逛老街。",autumn:"雲海機率高，山頂展望阿里山山脈。",winter:"乾冷晴朗，空氣清透。",
+ maps:[{t:"健行筆記：奮起湖大凍山步道",u:"https://hiking.biji.co/index.php?q=trail&act=detail&id=309"}],notice:"",tags:"嘉義 小百岳 奮起湖 老街 便當 森林浴",xb:60},
+{id:"duli",lots:[["樟腦寮車站","約 50 元／次（私人）","車站村內多處收費停車空間，有公廁"]],name:"獨立山國家步道",area:"嘉義竹崎｜樟腦寮",alt:816,diff:2,driveMin:100,driveVia:"國3 / 國1 → 嘉義 → 竹崎 → 159甲",nav:"樟腦寮車站",
+ parking:"樟腦寮車站一帶有多處私人收費停車場，約 50 元／次。",
+ length:"樟腦寮—獨立山頂—獨立山車站 O 型約 4–5 km；可搭阿里山林業鐵路省一半路程",lengthKm:4.5,time:"來回約 2–3 小時",hours:2.5,stay:"day",stayNote:"當日往返",permit:"免申請",
+ safety:["步道與鐵道交會，聽到火車鳴笛要遠離軌道，不要走在鐵軌上","石階多，雨後濕滑"],
+ best:[10,11,12,1,2,3,4],spring:"4 月山林新綠，可安排搭森林火車。",summer:"悶熱，清晨走。",autumn:"天氣穩定，可看森林鐵路螺旋爬升路線。",winter:"涼爽，最適合。",
+ maps:[],notice:"",tags:"嘉義 小百岳 森林鐵路 火車 親子 奉天岩",xb:58},
+{id:"tefuye",lots:[["特富野古道 自忠入口","免費","只有路邊寬闊處可臨停，車位極少，8 點前到"],["特富野古道 特富野入口","免費","全程穿越時另一端，需安排接駁"]],name:"特富野古道",area:"嘉義阿里山｜自忠—特富野",alt:2300,altNote:"約",diff:2,driveMin:165,driveVia:"國3 / 國1 → 嘉義 → 台18 往阿里山 → 自忠",nav:"特富野古道 自忠入口",
+ parking:"自忠入口只能路邊臨停，車位極少，建議 8 點前抵達；全程穿越要安排另一端接駁。",
+ length:"全長約 6.32 km；自忠 0K–3.7K 折返來回約 7.4 km",lengthKm:7.4,time:"折返約 3 小時；全程穿越 5–6 小時",hours:3,stay:"day",stayNote:"當日往返（可住阿里山）",permit:"免申請（國家級步道）",
+ safety:["舊鐵道枕木步道濕滑，看路面再踩","海拔 2,000 m 以上，午後起霧降溫","全程穿越後段在特富野部落，要先排好接駁"],
+ best:[3,4,5,10,11,12],spring:"柳杉林新綠，霧中鐵道最有氣氛。",summer:"避暑，午後雷雨。",autumn:"天氣穩，林相層次分明。",winter:"寒冷，偶結霜。",
+ maps:[{t:"健行筆記：特富野古道",u:"https://hiking.biji.co/index.php?q=trail&act=detail&id=315"}],notice:"",tags:"嘉義 阿里山 鐵道 柳杉 鄒族 古道"},
+{id:"ruitai",lots:[["瑞太古道 瑞里登山口","免費","鼎豐茶場附近路邊"],["瑞太古道 太和登山口","免費","登山口路邊"]],name:"瑞太古道",area:"嘉義梅山｜瑞里—太和",alt:1200,altNote:"約",diff:2,driveMin:110,driveVia:"國3 → 梅山 → 162甲",nav:"瑞太古道 瑞里登山口",
+ parking:"兩端登山口都可路邊停車，平日停車方便；紫藤季假日車多。",
+ length:"全程約 5 km（瑞里→望日峰約 4.1 km）",lengthKm:5,time:"單程約 2 小時，原路來回約 4 小時",hours:4,stay:"opt",stayNote:"可住瑞里",permit:"免申請",
+ safety:["密竹林段陰暗潮濕，石階易滑","秋季注意虎頭蜂，避免穿黑色衣物、噴香水","單程穿越需安排回程接駁"],
+ best:[3,4,10,11,12],spring:"3–4 月瑞里紫藤季，竹林步道最美。",summer:"林蔭涼爽，午後起霧。",autumn:"虎頭蜂活動期，留意公告。",winter:"望日峰看日出、雲海。",
+ maps:[{t:"健行筆記：瑞太古道",u:"https://hiking.biji.co/index.php?q=trail&act=detail&id=318"}],notice:"2026 年 5 月曾因發現虎頭蜂窩暫停開放，出發前請查最新狀況。",tags:"嘉義 梅山 瑞里 紫藤 竹林 古道 日出"},
+{id:"lizijiao",lots:[["太平三元宮","免費","有停車場與公廁，梨子腳山登山口"],["太平雲梯停車場","平日 30 元／時、假日 50 元／時","順遊太平雲梯"]],name:"梨子腳山・太平雲梯",area:"嘉義梅山｜太平",alt:1176,diff:1,driveMin:90,driveVia:"國3 → 梅山 → 162甲 往太平",nav:"太平三元宮",
+ parking:"導航「太平三元宮」有免費停車場與公廁；太平雲梯與老街另有收費停車場。",
+ length:"三元宮起 O 型約 2.5 km（梨子腳步道本身約 1 km）",lengthKm:2.5,time:"1.5–2 小時",hours:1.8,stay:"day",stayNote:"當日往返",permit:"免申請（太平雲梯門票 100 元，09:00–16:30，週三休）",
+ safety:["茶園產業道路有農用車進出","起霧時能見度低"],
+ best:[10,11,12,1,2,3,4],spring:"茶園新綠梯田。",summer:"午後起霧，清晨或傍晚來。",autumn:"雲海、夕陽，順遊太平雲梯。",winter:"晴朗乾燥，展望最好。",
+ maps:[],notice:"",tags:"嘉義 小百岳 茶園 太平雲梯 吊橋 老街 親子",xb:57},
+{id:"dajian",lots:[["二尖山休閒茶園","免費","約 15–20 格，假日早到；登大尖山最快"],["華山教育農園","依現場","車位較多，走 10-5 步道環線"]],name:"雲嘉大尖山・二尖山",area:"雲林古坑／嘉義梅山｜華山",alt:1299,diff:2,driveMin:85,driveVia:"國3 → 古坑交流道 → 台3 → 149 縣道",nav:"二尖山休閒茶園",
+ parking:"想輕鬆登頂停二尖山休閒茶園；走完整環線停華山教育農園。",
+ length:"茶園起登大尖山來回約 30 分鐘；華山環狀約 7.8 km，落差約 670 m",lengthKm:7.8,time:"30 分鐘（茶園線）至 3.5 小時（環線）",hours:2,stay:"day",stayNote:"當日往返",permit:"免申請",
+ safety:["華山 10-5 步道後段亂石、需抓繩陡上","茶園線短，但山頂風大"],
+ best:[10,11,12,1,2,3],spring:"茶園翠綠，竹林小徑。",summer:"悶熱，傍晚看夕陽。",autumn:"雲海與夕陽，晴天可望嘉南平原。",winter:"空氣清透，展望最好。",
+ maps:[{t:"健行筆記：雲嘉大尖山、二尖山",u:"https://hiking.biji.co/index.php?q=trail&act=detail&id=572"}],notice:"",tags:"雲林 嘉義 小百岳 茶園 雲海 夕陽 華山咖啡",xb:56},
+{id:"mianyue",lots:[["阿里山國家森林遊樂區","小型車 100 元","買電子門票可免停車費；從沼平經塔山步道進入"]],name:"眠月線（阿里山）",area:"嘉義阿里山｜阿里山森林遊樂區",alt:2300,altNote:"約",diff:3,driveMin:185,driveVia:"國3 / 國1 → 嘉義 → 台18",nav:"阿里山國家森林遊樂區",
+ parking:"停阿里山森林遊樂區停車場，早上 6 點前入園起登。",
+ length:"阿里山端經塔山步道接眠月線至石猴車站，來回約 18–20 km",lengthKm:19,time:"7–9 小時",hours:8,stay:"opt",stayNote:"可兩天一夜（住阿里山）",permit:"台灣一葉蘭自然保留區進入申請（入園前 5–60 日，每日 350 人，超額抽籤）＋遊樂區門票",
+ safety:["多座隧道，必帶頭燈","懸空鐵道與枕木間隙，專心看腳下","大崩壁路段落石，快速通過","距離長，下午 2 點前要折返"],
+ best:[3,4,5,10,11,12],spring:"3–4 月阿里山櫻花季後段、一葉蘭花期。",summer:"午後雷雨，宜早。",autumn:"天氣穩定，鐵道森林最美。",winter:"寒冷，隧道內外溫差大。",
+ maps:[{t:"林業保育署：塔山步道共線路段開放公告",u:"https://www.forest.gov.tw/news/0078643"}],notice:"塔山步道 0K–2K 修復，2026/9/1 起提前開放，可再由阿里山端進入眠月線。",tags:"嘉義 阿里山 鐵道 隧道 一葉蘭 秘境"},
+{id:"jiaming",lots:[["向陽國家森林遊樂區", "無停車空間", "遊樂區休園整修中，需自找南橫路邊空地"], ["池上 關山 嘉明湖接駁", "依業者", "建議搭接駁，關山工作站 089-811020"]],name:"嘉明湖（向陽山・三叉山）",area:"台東海端｜南橫向陽",alt:3603,diff:4,driveMin:330,driveVia:"國3 → 國10 → 台20 南橫（甲仙 → 梅山口 → 向陽）",nav:"向陽國家森林遊樂區",
+ parking:"向陽國家森林遊樂區休園整修中，沒有停車位、廁所與垃圾桶，只能找南橫路邊空地，建議搭池上／關山接駁。",
  length:"來回約 26 km",lengthKm:26,time:"3 天 2 夜",hours:30,stay:"need",stayNote:"向陽山屋＋嘉明湖避難山屋（住宿前 30 日至前 4 日每天 15:00 抽籤）",permit:"入山證＋山屋床位",
  safety:["南橫梅山口–向陽週二、三、四不開放；開放日 07:00–14:00 進入、17:00 前離開","三叉山一帶起霧易迷途，緊跟軌跡","稜線無遮蔽，強風失溫","天數長、海拔高，第一晚注意高山症"],
  best:[10,11,4,5],spring:"5 月高山杜鵑。",summer:"颱風與雷雨季。",autumn:"10–11 月最穩，湖面湛藍如「天使的眼淚」。",winter:"湖面可能結冰，需冰爪。",
  maps:[{t:"嘉明湖山屋申請",u:"https://jmlnt.forest.gov.tw/room/"},{t:"健行筆記：嘉明湖",u:"https://hiking.biji.co/index.php?q=trail&act=detail&id=347"},{t:"山林悠遊網：嘉明湖國家步道",u:"https://recreation.forest.gov.tw/Trail/RT?tr_id=139"}],
- notice:"南橫管制時段依公路局公告為準（查核至 2026/8）。",tags:"百岳 高山湖泊 山屋 草原"},
-{id:"matcha",name:"抹茶山（聖母登山步道）",area:"宜蘭礁溪｜五峰旗",alt:900,diff:3,driveMin:160,driveVia:"國3 / 國1 → 國5 → 礁溪",nav:"五峰旗瀑布停車場",
+ notice:"向陽國家森林遊樂區休園整修中（2026/6 仍休園），無停車空間與廁所；南橫管制時段依公路局公告為準。",tags:"百岳 高山湖泊 山屋 草原"},
+{id:"matcha",lots:[["五峰旗瀑布停車場", "50 元／次", "距登山口約 1 km；假日 8 點前到"], ["抹茶山停車場 聖母登山步道", "依現場", "產業道路旁，假日可能收費"]],name:"抹茶山（聖母登山步道）",area:"宜蘭礁溪｜五峰旗",alt:900,diff:3,driveMin:160,driveVia:"國3 / 國1 → 國5 → 礁溪",nav:"五峰旗瀑布停車場",
  parking:"五峰旗風景區停車場或聖母朝聖地停車場，假日爆滿。",
  length:"來回約 7–8 km，石階多；由聖母山莊續行可登小百岳三角崙山",lengthKm:7.5,time:"4–5 小時",hours:4.5,stay:"opt",stayNote:"可安排礁溪溫泉過夜",permit:"免申請",
  safety:["石階、土徑雨後濕滑","宜蘭秋冬多雨霧，常看不到山景","夏季午後雷雨"],
@@ -588,11 +671,23 @@ function filtered(){
   return rows;
 }
 
+
+function renderPark(rows){
+  $("parkBody").innerHTML = rows.length ? rows.map(function(t){
+    var L = (t.lots&&t.lots.length) ? t.lots : [[t.nav||t.name,"依現場",t.parking||""]];
+    return L.map(function(l,i){
+      return '<tr>'+(i===0?'<td rowspan="'+L.length+'" class="pk-name"><button type="button" class="linkbtn" data-open="'+esc(t.id)+'">'+esc(shortName(t))+'</button><span class="mono">'+fmtDrive(t.driveMin)+'</span></td>':'')+
+        '<td>'+esc(l[0])+'</td><td>'+esc(l[1]||"依現場")+'</td><td class="pk-note">'+esc(l[2]||"")+'</td>'+
+        '<td><a href="'+navUrl({nav:l[0]})+'" target="_blank" rel="noopener">導航</a></td></tr>';
+    }).join("");
+  }).join("") : '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">沒有符合條件的路線。</td></tr>';
+}
 /* ---------- list ---------- */
 var current = null;
 function renderList(){
   var rows = filtered();
   $("count").textContent = "符合 " + rows.length + " 條路線" + (F.month? "（"+F.month+" 月適合）":"");
+  renderPark(rows);
   if(!rows.length){ $("list").innerHTML = '<div class="empty">沒有符合條件的路線。放寬車程或難度試試。</div>'; return; }
   $("list").innerHTML = rows.map(function(t){
     var log = store.log[t.id]||{};
@@ -600,7 +695,7 @@ function renderList(){
     return '<button type="button" class="row" data-id="'+esc(t.id)+'" style="--dc:'+dcolor(t.diff)+'" aria-current="'+(t.id===current)+'">'+
       '<span class="stripe"></span><span class="row-in">'+
         '<span class="row-top"><span class="rname">'+esc(t.name)+'</span><span class="dlevel">'+(DIFF[t.diff]||"")+' '+esc(t.diff)+'/5</span></span>'+
-        '<span class="sub">'+esc(t.area)+' · 海拔 <span class="mono">'+esc(t.alt)+'</span> m</span>'+
+        '<span class="sub">'+esc(t.area)+' · 海拔 <span class="mono">'+(t.altNote?esc(t.altNote)+' ':'')+esc(t.alt)+'</span> m</span>'+
         '<span class="facts"><span><span class="k">車程</span><span class="mono">'+fmtDrive(t.driveMin)+'</span></span><span><span class="k">距離</span>'+esc(shortLen(t))+'</span><span><span class="k">時間</span>'+esc(t.time)+'</span></span>'+
         '<span class="chips">'+(inSeason?'<span class="tag in">'+(F.month||NOW_M)+' 月適合</span>':'')+
           '<span class="tag'+(t.stay==="need"?" need":"")+'">'+(STAY[t.stay]||"")+'</span>'+
@@ -609,6 +704,16 @@ function renderList(){
         '</span>'+
       '</span></button>';
   }).join("");
+}
+
+function lotsHtml(t){
+  var L = t.lots||[];
+  if(!L.length) return "";
+  return '<div class="lots">'+L.map(function(l){
+    return '<div class="lot"><div class="lot-main"><b>'+esc(l[0])+'</b><span class="fee">'+esc(l[1]||"依現場")+'</span></div>'+
+      (l[2]?'<p>'+esc(l[2])+'</p>':'')+
+      '<a href="'+navUrl({nav:l[0]})+'" target="_blank" rel="noopener">導航到這裡</a></div>';
+  }).join("")+'</div>';
 }
 function shortLen(t){ return t.lengthKm? ("約 "+t.lengthKm+" km") : (t.length||"—"); }
 $("list").addEventListener("click", function(e){ var r=e.target.closest(".row"); if(r) open(r.dataset.id, true); });
@@ -642,7 +747,7 @@ function renderSheet(){
       '<span class="eyebrow">'+esc(t.area)+'</span>'+
       '<h2>'+esc(t.name)+'</h2>'+
       ((t.gk||t.xb)?'<span class="chips">'+(t.gk?'<span class="tag">谷關七雄・'+GKNAME[t.gk]+'</span>':'')+(t.xb?'<span class="tag">台灣小百岳 #'+t.xb+'</span>':'')+'</span>':'')+
-      '<span class="dlevel" style="font-size:14px">難度 '+esc(t.diff)+'/5・'+(DIFF[t.diff]||"")+'　·　海拔 '+esc(t.alt)+' m</span>'+
+      '<span class="dlevel" style="font-size:14px">難度 '+esc(t.diff)+'/5・'+(DIFF[t.diff]||"")+'　·　海拔 '+(t.altNote?esc(t.altNote)+' ':'')+esc(t.alt)+' m</span>'+
     '</div>'+
     (t.notice?'<div class="notice"><b>最新公告　</b>'+esc(t.notice)+'</div>':'')+
     '<div class="kv">'+
@@ -650,8 +755,9 @@ function renderSheet(){
       '<div><span class="k">步道長度</span><span class="v">'+(t.lengthKm?esc(t.lengthKm)+" km":"—")+'<small>來回／全程</small></span></div>'+
       '<div><span class="k">來回時間</span><span class="v" style="font-family:var(--body)">'+esc(t.time)+'</span></div>'+
     '</div>'+
-    '<div class="sec"><h4>交通與停車</h4><p>'+esc(t.driveVia)+'</p><p>'+esc(t.parking)+'</p>'+
+    '<div class="sec"><h4>交通</h4><p>'+esc(t.driveVia)+'</p>'+
       '<a class="nav-btn" href="'+navUrl(t)+'" target="_blank" rel="noopener">Google 導航・看即時車程 →</a></div>'+
+    '<div class="sec"><h4>停車資訊</h4>'+lotsHtml(t)+'<p>'+esc(t.parking)+'</p></div>'+
     '<div class="sec"><h4>步道長度</h4><p>'+esc(t.length)+'</p></div>'+
     '<div class="sec"><h4>過夜與申請</h4><p><span class="tag'+(t.stay==="need"?" need":"")+'">'+(STAY[t.stay]||"")+'</span>　'+esc(t.stayNote)+'</p><p>申請：'+esc(t.permit)+'</p></div>'+
     '<div class="sec"><h4>難易與安全</h4><ul>'+(t.safety||[]).map(function(s){return "<li>"+esc(s)+"</li>";}).join("")+'</ul></div>'+
@@ -673,19 +779,20 @@ function renderSheet(){
 
 var FIELDS = [
   ["name","名稱","text"],["area","地區","text"],["alt","最高海拔（m）","num"],["diff","難度（1–5）","diff"],
-  ["driveMin","西屯出發車程（分鐘）","num"],["driveVia","路線","text"],["nav","Google 導航目的地","text"],["parking","停車建議","area"],
+  ["driveMin","西屯出發車程（分鐘）","num"],["driveVia","路線","text"],["nav","Google 導航目的地","text"],["lots","停車場（一行一處：名稱｜收費｜備註）","lots"],["parking","停車補充說明","area"],
   ["length","步道長度說明","text"],["lengthKm","長度（km，排序用）","num"],["time","來回時間","text"],["hours","時間（小時，排序用）","num"],
   ["stay","過夜","stay"],["stayNote","山屋／營地說明","text"],["permit","申請","text"],["safety","安全注意（一行一點）","lines"],
   ["best","建議月份","months"],["spring","春","area"],["summer","夏","area"],["autumn","秋","area"],["winter","冬","area"],
   ["notice","最新公告","area"],["tags","關鍵字（空白分隔）","text"]
 ];
 function renderForm(t){
-  var v = t || {name:"",area:"",alt:"",diff:3,driveMin:60,driveVia:"",nav:"",parking:"",length:"",lengthKm:"",time:"",hours:"",stay:"day",stayNote:"",permit:"免申請",safety:[],best:[],spring:"",summer:"",autumn:"",winter:"",notice:"",tags:""};
+  var v = t || {lots:[],name:"",area:"",alt:"",diff:3,driveMin:60,driveVia:"",nav:"",parking:"",length:"",lengthKm:"",time:"",hours:"",stay:"day",stayNote:"",permit:"免申請",safety:[],best:[],spring:"",summer:"",autumn:"",winter:"",notice:"",tags:""};
   var html = FIELDS.map(function(f){
     var k=f[0], lab=f[1], ty=f[2], val=v[k], id="f_"+k;
     if(ty==="text"||ty==="num") return '<label for="'+id+'">'+lab+'<input class="inp" id="'+id+'" type="'+(ty==="num"?"number":"text")+'" step="any" value="'+esc(val)+'"></label>';
     if(ty==="area") return '<label for="'+id+'">'+lab+'<textarea id="'+id+'">'+esc(val)+'</textarea></label>';
     if(ty==="lines") return '<label for="'+id+'">'+lab+'<textarea id="'+id+'">'+esc((val||[]).join("\n"))+'</textarea></label>';
+    if(ty==="lots") return '<label for="'+id+'">'+lab+'<textarea id="'+id+'">'+esc((val||[]).map(function(l){return l.join("｜");}).join("\n"))+'</textarea></label>';
     if(ty==="diff") return '<label for="'+id+'">'+lab+'<select id="'+id+'">'+[1,2,3,4,5].map(function(d){return '<option value="'+d+'"'+(+val===d?" selected":"")+'>'+d+'・'+DIFF[d]+'</option>';}).join("")+'</select></label>';
     if(ty==="stay") return '<label for="'+id+'">'+lab+'<select id="'+id+'">'+Object.keys(STAY).map(function(s){return '<option value="'+s+'"'+(val===s?" selected":"")+'>'+STAY[s]+'</option>';}).join("")+'</select></label>';
     if(ty==="months") return '<div><span class="count">'+lab+'</span><div class="mcheck">'+[1,2,3,4,5,6,7,8,9,10,11,12].map(function(m){return '<label><input type="checkbox" id="f_best_'+m+'" data-m="'+m+'"'+((val||[]).indexOf(m)>=0?" checked":"")+'>'+m+'月</label>';}).join("")+'</div></div>';
@@ -703,6 +810,7 @@ function submitForm(t){
     var el = $("f_"+k); if(!el) return; var val = el.value;
     if(ty==="num"||ty==="diff") val = val===""? "" : +val;
     if(ty==="lines") val = val.split("\n").map(function(s){return s.trim();}).filter(Boolean);
+    if(ty==="lots") val = val.split("\n").map(function(s){return s.trim();}).filter(Boolean).map(function(s){ var a=s.split(/[｜|]/).map(function(x){return x.trim();}); return [a[0]||"",a[1]||"",a.slice(2).join("｜")]; });
     out[k] = val;
   });
   if(!String(out.name).trim()){ $("formMsg").textContent="請填寫名稱。"; return; }
@@ -713,7 +821,8 @@ function submitForm(t){
     store.custom = store.custom.map(function(c){ return c.id===t.id ? Object.assign({},c,out) : c; });
   } else {
     var base = TRAILS.filter(function(b){return b.id===t.id;})[0], diff = {};
-    Object.keys(out).forEach(function(k){ if(JSON.stringify(out[k])!==JSON.stringify(base[k])) diff[k]=out[k]; });
+    var norm=function(k,v){ return k==="best" ? JSON.stringify((v||[]).slice().sort(function(x,y){return x-y;})) : JSON.stringify(v==null?"":v); };
+    Object.keys(out).forEach(function(k){ if(norm(k,out[k])!==norm(k,base[k])) diff[k]=out[k]; });
     if(Object.keys(diff).length) store.edits[t.id]=diff; else delete store.edits[t.id];
   }
   save(); mode="view"; renderList(); renderSheet();
@@ -824,6 +933,7 @@ $("xbBody").addEventListener("change", function(e){
   save(); renderXB();
 });
 $("xbBody").addEventListener("click", function(e){ var b=e.target.closest("[data-open]"); if(b) open(b.dataset.open,true); });
+$("parkBody").addEventListener("click", function(e){ var b=e.target.closest("[data-open]"); if(b) open(b.dataset.open,true); });
 $("gkRow").addEventListener("click", function(e){ var b=e.target.closest(".gk"); if(b) open(b.dataset.id,true); });
 
 function renderAll(){ renderList(); renderSheet(); renderCheck(); renderXB(); }
